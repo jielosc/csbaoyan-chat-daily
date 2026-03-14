@@ -1,159 +1,63 @@
 # CS Baoyan Chat Daily
 
-把 QQ 保研群聊导出 JSON 转成匿名化聊天记录、结构化日报，以及可部署到 GitHub Pages 的静态网页。
+这是一个面向 CS 保研群（绿群）的信息日报项目。
 
-## 功能
+项目的目标不是制造更多信息，而是尽可能把分散在群聊里的经验、通知、提醒和讨论，整理成可阅读、可追溯的日报，尽量打破信息差。
 
-- 读取群聊 JSON 导出文件
-- 对昵称、提及等做统一匿名化
-- 按 Chunk 提取有效信息，再合成日报
-- 同步站点索引到 `pages/`
-- 可直接提交 `pages/data/` 用于 GitHub Pages 部署
+## 免责声明
 
-## 环境
+本项目产出的日报，本质上是对群聊信息的整理、归纳与再表达，仅供参考，不应视为官方结论或正式通知。
 
-- Python 3.11+
-- 一个 OpenAI-compatible API
+由于原始信息来自群聊讨论，可能存在时效性变化、表达偏差、信息遗漏或个体经验不具备普适性的情况；涉及报名要求、夏令营/预推免安排、材料提交、时间节点等内容，请始终以学校、院系、导师或官方平台发布的信息为准。
 
-安装依赖：
+## 项目主要流程
 
-```bash
-pip install -r requirements.txt
-```
+整个流程可以概括为：
 
-## 配置
+1. 读取已经导出的 QQ 群聊天 JSON。
+2. 对聊天内容做清洗和匿名化处理，尽量保留信息、去掉不必要的身份暴露。
+3. 按主题和上下文分块提取有效内容，过滤灌水与重复信息。
+4. 将分块结果进一步整理，生成结构化的每日日报。
+5. 把最终日报同步到静态页面目录，便于统一归档和公开浏览。
 
-项目支持从环境变量或本地 `.env` 读取配置。
+运行过程中，日报产物大致可以分为两类：
 
-1. 复制 `.env.example` 为 `.env`
-2. 按你的环境填写值
+- `internal/`：本地生成的内部中间产物，如脱敏后的聊天记录、提取草稿等，默认不进入 GitHub 仓库。
+- `pages/data/reports/`：最终公开的日报内容。
 
-关键变量：
+## 为什么做这个项目
 
-- `CSBAOYAN_EXPORT_DIR`：原始聊天导出目录
-- `CSBAOYAN_PAGES_DIR`：静态站点目录
-- `OPENAI_BASE_URL`：兼容 OpenAI 的接口地址
-- `OPENAI_API_KEY`：API Key
-- `OPENAI_MODEL`：模型名
+保研相关信息天然分散，常见问题包括：
 
-## 用法
+- 重要通知埋在大量聊天消息里，后加入的人很难补课。
+- 同样的问题会被反复提问，信息沉淀效率不高。
+- 有价值的经验分享往往出现得很随机，不容易被系统整理。
+- 绿群本身有人数上限，会定期清理长期不发言的人，不是所有人都能一直留在群里。
+- 群消息量非常大，普通人很难长期、高频地完整跟进。
 
-生成最新一期日报：
+这个项目的初衷，就是把群聊里高价值、时效性强的信息尽量沉淀下来，降低后来者获取信息的门槛，减少因为信息不对称带来的额外成本。
 
-```bash
-python generate_daily_report.py
-```
+一方面，它希望让没有在绿群里、或者因为群容量限制无法长期留在群里的人，也能看到其中一部分有价值的信息；另一方面，它也希望帮助已经在群里、但没有精力高强度爬楼的人，更快了解每天讨论中的重点内容。
 
-生成指定日期日报：
+## 致谢
 
-```bash
-python generate_daily_report.py --date 2026-03-13
-```
+本项目所处理的“绿群”语境，来源于 CS-BAOYAN 社区：
 
-只同步 Pages 数据：
+- https://github.com/CS-BAOYAN
 
-```bash
-python sync_pages_data.py
-```
+聊天记录导出环节使用了开源工具：
 
-发布前检查公开产物：
+- https://github.com/shuakami/qq-chat-exporter
 
-```bash
-python release_check.py
-```
+感谢相关开源项目和社区长期提供的资料、工具与维护工作。
 
-本地预览网页：
+## 贡献
 
-```bash
-cd pages
-python -m http.server 8000
-```
+欢迎提交 issue、想法、改进建议，也欢迎直接发 PR。
 
-然后打开 `http://localhost:8000/`。
+如果你有下面这些方向的优化，都会很有价值：
 
-## GitHub Pages
-
-静态网页资源位于 `pages/`，站点数据位于 `pages/data/`。
-网页会直接加载 `pages/data/reports/*.md`，并在浏览器中渲染 Markdown。
-Markdown 渲染依赖已随仓库一起放在 `pages/vendor/`，不依赖外部 CDN。
-
-生成脚本的落盘位置如下：
-
-- `internal/transcripts/<date>.txt`：脱敏聊天记录，仅供内部审阅
-- `internal/extracted/<date>.md`：分块提取中间结果，仅供内部审阅
-- `pages/data/reports/<date>.md`：最终日报
-
-如果你希望把生成后的页面直接部署到 GitHub Pages，可以提交 `pages/` 目录内容，并通过以下两种方式之一部署：
-
-- 使用 GitHub Actions 部署 `pages/` 目录
-- 或把站点目录迁移到 GitHub Pages 默认识别的位置后部署
-
-## 自动化运行
-
-当前项目的 `generate_daily_report.py` 依赖你本机的聊天导出目录和本地 `.env`，所以“每天早上 06:30 自动生成日报”更适合放在你的 Windows 电脑上执行，而不是放到 GitHub 托管的定时任务里。
-
-### 1. 本地每日 06:30 自动执行
-
-先确保以下条件已经满足：
-
-- 本机已安装 Python 3.11+
-- 已填写 `.env`
-- 已执行 `git remote add origin <你的 GitHub 仓库地址>`
-- 当前分支为你要推送的分支（默认按 `main` 处理）
-
-每日流水线脚本会依次执行：
-
-1. `python generate_daily_report.py`
-2. `python release_check.py`
-3. `git add --all -- pages/data`
-4. `git commit -m "chore: update pages data"`
-5. `git push`
-
-手动运行一次：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\daily_pipeline.ps1
-```
-
-注册为每天 06:30 的 Windows 计划任务：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\register_daily_task.ps1
-```
-
-如果你需要指定 Python 路径，可以这样：
-
-```powershell
-powershell -ExecutionPolicy Bypass -File .\scripts\register_daily_task.ps1 -PythonCommand "C:\Python311\python.exe"
-```
-
-默认任务名为 `CSBaoyanDailyReport`，默认时间为本机时区下的 `06:30`。当前注册方式使用“用户登录时运行”；如果你希望在锁屏或注销后也继续执行，可以在 Windows 任务计划程序里把该任务改为“无论用户是否登录都要运行”并保存密码。
-
-### 2. GitHub Pages 自动部署
-
-仓库已提供 [`.github/workflows/deploy-pages.yml`](.github/workflows/deploy-pages.yml)，当 `main` 分支上的 `pages/` 有变更时会自动部署到 GitHub Pages。
-
-你还需要在 GitHub 仓库页面完成一次设置：
-
-1. 进入 `Settings > Pages`
-2. 在 `Build and deployment` 里把 `Source` 设为 `GitHub Actions`
-3. 确保默认分支是 `main`
-
-完成后，本地计划任务每天推送新生成的 `pages/data`，GitHub 就会自动发布到 Pages。
-
-## 仓库内容说明
-
-- `pages/`：静态网页、公开日报和索引数据
-- `internal/`：不建议公开的中间提取产物
-
-当前仓库保留了匿名化后的示例产物，便于直接查看效果。是否继续公开这些内容，取决于你对匿名化充分性的判断。
-
-## Public Release Notes
-
-- 建议公开 `pages/data/reports/`，不要公开 `internal/`
-- 日报内容来自群聊整理与公开信息交叉归纳，仅供参考，请以官方通知和公开资料为准
-- 若涉及未核实信息、主观经验或争议评价，应在页面或正文中明确标注“待核实”
-
-## 许可证
-
-本项目默认采用 MIT License，见 `LICENSE`。
+- 日报提取与整理质量
+- 匿名化与发布前检查
+- 页面展示与归档体验
+- 流程自动化与稳定性
