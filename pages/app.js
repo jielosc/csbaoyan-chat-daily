@@ -1,6 +1,7 @@
 const state = {
   manifest: [],
   activeDate: null,
+  abortController: null,
 };
 
 const elements = {
@@ -89,6 +90,21 @@ function renderArchive() {
     return;
   }
 
+  const existingItems = elements.archiveList.querySelectorAll(".archive-item");
+  if (existingItems.length === state.manifest.length) {
+    for (const button of existingItems) {
+      const isActive = button.dataset.date === state.activeDate;
+      if (isActive) {
+        button.classList.add("active");
+        button.setAttribute("aria-pressed", "true");
+      } else {
+        button.classList.remove("active");
+        button.setAttribute("aria-pressed", "false");
+      }
+    }
+    return;
+  }
+
   elements.archiveList.innerHTML = state.manifest
     .map((item) => {
       const isActive = item.date === state.activeDate;
@@ -129,12 +145,18 @@ async function loadReport(date) {
   updateHeader(item);
   showLoading(true);
 
+  if (state.abortController) {
+    state.abortController.abort();
+  }
+  state.abortController = new AbortController();
+  const signal = state.abortController.signal;
+
   try {
     if (!item.md_path) {
       throw new Error("Missing report path");
     }
 
-    const response = await fetch(`./data/${item.md_path}`, { cache: "no-store" });
+    const response = await fetch(`./data/${item.md_path}`, { cache: "no-store", signal });
     if (!response.ok) {
       throw new Error(`HTTP ${response.status}`);
     }
@@ -146,6 +168,7 @@ async function loadReport(date) {
       elements.reportContent.classList.add("ready");
     });
   } catch (error) {
+    if (error.name === 'AbortError') return;
     console.error(error);
     showLoading(false);
     showMessage("error-state", "日报内容加载失败，请稍后刷新重试。");

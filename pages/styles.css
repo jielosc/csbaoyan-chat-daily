@@ -1,4 +1,5 @@
 :root {
+  color-scheme: light dark;
   --bg: #f2ebdf;
   --bg-deep: #e7dcc9;
   --paper: rgba(255, 251, 244, 0.82);
@@ -32,6 +33,7 @@ body {
     linear-gradient(180deg, var(--bg), var(--bg-deep));
   color: var(--ink);
   font-family: "Noto Serif SC", "Source Han Serif SC", "Songti SC", serif;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 body::before {
@@ -175,6 +177,15 @@ a.status-chip:hover {
   background: rgba(255, 255, 255, 0.9);
 }
 
+button.status-chip {
+  cursor: pointer;
+  padding: 10px;
+}
+
+button.status-chip svg {
+  display: block;
+}
+
 .layout {
   display: grid;
   grid-template-columns: minmax(300px, 340px) minmax(0, 1fr);
@@ -188,6 +199,7 @@ a.status-chip:hover {
   background: var(--paper);
   box-shadow: var(--shadow);
   backdrop-filter: blur(18px);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .archive-panel {
@@ -280,6 +292,7 @@ a.status-chip:hover {
   border-radius: calc(var(--radius-xl) - 8px);
   background: var(--paper-strong);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .report-content {
@@ -524,15 +537,6 @@ a.status-chip:hover {
     font-size: 0.98rem;
     line-height: 1.82;
   }
-}
-
-button.status-chip {
-  cursor: pointer;
-  padding: 10px;
-}
-
-button.status-chip svg {
-  display: block;
 }
 
 [data-theme="dark"] {
