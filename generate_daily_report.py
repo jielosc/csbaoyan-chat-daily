@@ -1,0 +1,108 @@
+from __future__ import annotations
+
+import argparse
+import logging
+import sys
+from pathlib import Path
+
+from app_config import EXPORT_DIR, OPENAI_API_KEY, OPENAI_BASE_URL, OPENAI_MODEL, PAGES_DIR
+from chat_processing import anonymize_messages, chunk_messages, write_anonymized_transcript
+from file_utils import (
+    extract_messages,
+    get_json_file_by_date,
+    get_latest_json_file,
+    infer_report_date,
+    load_chat_export,
+    prepare_output_paths,
+    validate_report_date,
+)
+from report_generation import create_openai_client, extract_all_chunks, generate_final_report
+from sync_pages_data import sync_pages_data
+
+
+DEFAULT_EXPORT_DIR = EXPORT_DIR
+DEFAULT_MODEL = OPENAI_MODEL
+DEFAULT_BASE_URL = OPENAI_BASE_URL
+DEFAULT_API_KEY = OPENAI_API_KEY
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Generate a daily summary from a QQ chat export.")
+    parser.add_argument("--export-dir", type=Path, default=DEFAULT_EXPORT_DIR, help="Directory containing exported QQ chat JSON files.")
+    parser.add_argument("--date", type=validate_report_date, help="Target report date in YYYY-MM-DD format.")
+    parser.add_argument("--model", default=DEFAULT_MODEL, help="OpenAI-compatible model name.")
+    parser.add_argument("--chunk-max-chars", type=int, default=30000, help="Maximum character count per chunk.")
+    parser.add_argument("--chunk-max-messages", type=int, default=600, help="Maximum message count per chunk.")
+    parser.add_argument("--chunk-overlap-messages", type=int, default=30, help="Number of overlapping messages between adjacent chunks.")
+    parser.add_argument("--retries", type=int, default=3, help="Maximum retry count for failed LLM calls.")
+    parser.add_argument("--timeout", type=float, default=60.0, help="LLM request timeout in seconds.")
+    parser.add_argument("--temperature", type=float, default=0.2, help="Sampling temperature for the LLM.")
+    parser.add_argument("--max-workers", type=int, default=4, help="Worker count for chunk extraction.")
+    parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Optional custom base URL for an OpenAI-compatible API.")
+    parser.add_argument("--api-key", default=DEFAULT_API_KEY, help="Optional API key for the OpenAI-compatible API.")
+    return parser.parse_args()
+
+
+def main() -> int:
+    args = parse_args()
+    logging.basicConfig(level=logging.INFO, format="%(asctime)s [%(levelname)s] %(message)s")
+
+    try:
+        export_file = get_json_file_by_date(args.export_dir, args.date) if args.date else get_latest_json_file(args.export_dir)
+        payload = load_chat_export(export_file)
+        messages = extract_messages(payload)
+        anonymized_messages = anonymize_messages(messages)
+        chunks = chunk_messages(
+            anonymized_messages,
+            max_chars=args.chunk_max_chars,
+            max_messages=args.chunk_max_messages,
+            overlap_messages=args.chunk_overlap_messages,
+        )
+
+        inferred_report_date = infer_report_date(payload, export_file)
+        report_date = args.date or inferred_report_date
+        extracted_path, report_path, transcript_path = prepare_output_paths(PAGES_DIR, report_date)
+        write_anonymized_transcript(anonymized_messages, transcript_path)
+
+        client = create_openai_client(args.api_key, args.base_url, args.timeout)
+
+        if args.date:
+            logging.info("使用日期 %s 的导出文件：%s", args.date, export_file)
+            if inferred_report_date != args.date:
+                logging.warning("指定日期为 %s，但导出内容推断日期为 %s，将按指定日期输出。", args.date, inferred_report_date)
+        else:
+            logging.info("使用最新导出文件：%s", export_file)
+        logging.info("脱敏后消息数：%s，Chunk 数：%s", len(anonymized_messages), len(chunks))
+
+        extract_all_chunks(
+            chunks=chunks,
+            extracted_path=extracted_path,
+            client=client,
+            model=args.model,
+            retries=args.retries,
+            temperature=args.temperature,
+            max_workers=args.max_workers,
+        )
+
+        generate_final_report(
+            extracted_path=extracted_path,
+            final_report_path=report_path,
+            client=client,
+            model=args.model,
+            retries=args.retries,
+            temperature=args.temperature,
+        )
+
+        sync_pages_data(site_dir=PAGES_DIR)
+
+        logging.info("中间提取结果：%s", extracted_path)
+        logging.info("脱敏聊天记录：%s", transcript_path)
+        logging.info("最终日报：%s", report_path)
+        return 0
+    except Exception as exc:
+        logging.exception("生成日报失败：%s", exc)
+        return 1
+
+
+if __name__ == "__main__":
+    sys.exit(main())

@@ -1,0 +1,70 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CS保研绿群日报</title>
+    <meta
+      name="description"
+      content="按日期浏览保研信息日报，默认显示最新一期，支持静态部署到 GitHub Pages。"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <script defer src="./vendor/marked.min.js"></script>
+    <script defer src="./vendor/purify.min.js"></script>
+    <script defer src="./app.js"></script>
+  </head>
+  <body>
+    <div class="backdrop" aria-hidden="true"></div>
+    <div class="site-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow">CS Baoyan Chat Daily</p>
+          <h1>CS保研绿群日报</h1>
+          <p class="hero-summary">
+            每天一份日报，按日期回看。默认展示最新一期，保留稳定、克制、顺手的阅读体验。
+          </p>
+          <p class="disclaimer-note">
+            内容来自群聊整理与公开信息交叉归纳，仅供参考；涉及时效性、主观经验和未核实内容时，请以官方通知和公开资料为准。
+          </p>
+        </div>
+        <div class="hero-status">
+          <span class="status-chip">静态站点</span>
+          <span class="status-chip" id="report-count">0 篇日报</span>
+        </div>
+      </header>
+
+      <div class="layout">
+        <aside class="archive-panel" aria-label="日报归档">
+          <div class="panel-heading">
+            <p class="panel-kicker">Archive</p>
+            <h2>日期切换</h2>
+            <p class="panel-note">按日期浏览历史日报，最新一期始终排在最前。</p>
+          </div>
+          <nav class="archive-list" id="archive-list">
+            <div class="archive-placeholder">
+              <span class="dot"></span>
+              <span class="dot"></span>
+              <span class="dot"></span>
+            </div>
+          </nav>
+        </aside>
+
+        <main class="reader-panel">
+          <section class="reader-intro">
+            <p class="reader-label" id="active-date-label">正在加载日报...</p>
+            <h2>日报正文</h2>
+          </section>
+
+          <section class="report-card" aria-live="polite">
+            <div class="loading-state" id="loading-state">
+              <div class="loading-line wide"></div>
+              <div class="loading-line"></div>
+              <div class="loading-line narrow"></div>
+            </div>
+            <article class="report-content" id="report-content"></article>
+          </section>
+        </main>
+      </div>
+    </div>
+  </body>
+</html>
