@@ -2,6 +2,8 @@ const state = {
   manifest: [],
   activeDate: null,
   abortController: null,
+  reportsCache: {},
+  isSearching: false,
 };
 
 const elements = {
@@ -11,6 +13,12 @@ const elements = {
   loadingState: document.querySelector("#loading-state"),
   reportContent: document.querySelector("#report-content"),
   themeToggle: document.querySelector("#theme-toggle"),
+  searchBtn: document.querySelector("#search-btn"),
+  searchModal: document.querySelector("#search-modal"),
+  searchBackdrop: document.querySelector("#search-backdrop"),
+  searchInput: document.querySelector("#search-input"),
+  closeSearchBtn: document.querySelector("#close-search-btn"),
+  searchResults: document.querySelector("#search-results"),
 };
 
 function updateThemeIcon(theme) {
@@ -224,5 +232,129 @@ window.addEventListener("hashchange", () => {
   loadReport(targetDate);
 });
 
+// --- Search Functionality ---
+let searchDebounceTimeout = null;
+
+function openSearch() {
+  elements.searchModal.hidden = false;
+  elements.searchInput.focus();
+  prefetchAllReports();
+}
+
+function closeSearch() {
+  elements.searchModal.hidden = true;
+  elements.searchInput.value = '';
+  elements.searchResults.innerHTML = '<div class="search-placeholder">输入关键词开始搜索...</div>';
+}
+
+async function prefetchAllReports() {
+  if (state.isSearching || Object.keys(state.reportsCache).length === state.manifest.length) return;
+  state.isSearching = true;
+  try {
+    const promises = state.manifest.map(async (item) => {
+      if (state.reportsCache[item.date]) return;
+      const res = await fetch(`./data/${item.md_path}`, { cache: "force-cache" });
+      if (res.ok) {
+        state.reportsCache[item.date] = await res.text();
+      }
+    });
+    await Promise.all(promises);
+    // If user already typed something while fetching, perform search
+    if (elements.searchInput.value.trim()) {
+      performSearch(elements.searchInput.value);
+    }
+  } catch (err) {
+    console.error("Failed to prefetch reports for search:", err);
+  } finally {
+    state.isSearching = false;
+  }
+}
+
+function performSearch(query) {
+  if (!query.trim()) {
+    elements.searchResults.innerHTML = '<div class="search-placeholder">输入关键词开始搜索...</div>';
+    return;
+  }
+
+  const keywords = query.trim().toLowerCase().split(/\s+/);
+  const results = [];
+
+  for (const item of state.manifest) {
+    const text = state.reportsCache[item.date];
+    if (!text) continue;
+
+    const lowerText = text.toLowerCase();
+    const isMatch = keywords.every(kw => lowerText.includes(kw));
+
+    if (isMatch) {
+      const firstKwIndex = lowerText.indexOf(keywords[0]);
+      const start = Math.max(0, firstKwIndex - 40);
+      const end = Math.min(text.length, firstKwIndex + 120);
+      let snippet = text.substring(start, end);
+      
+      snippet = snippet.replace(/[\r\n]+/g, ' ').replace(/[#*`_>]/g, '');
+      snippet = escapeHtml(snippet);
+      
+      if (start > 0) snippet = '...' + snippet;
+      if (end < text.length) snippet += '...';
+
+      keywords.forEach(kw => {
+        const escapedKw = escapeHtml(kw);
+        const regex = new RegExp(`(${escapedKw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        snippet = snippet.replace(regex, '<mark>$1</mark>');
+      });
+
+      results.push({ date: item.date, snippet });
+    }
+  }
+
+  if (results.length === 0) {
+    elements.searchResults.innerHTML = '<div class="search-placeholder">没有找到相关结果</div>';
+    return;
+  }
+
+  elements.searchResults.innerHTML = results.map(res => `
+    <a href="#${res.date}" class="search-result-item" data-date="${res.date}">
+      <h3 class="search-result-title">${formatDate(res.date)}</h3>
+      <div class="search-result-snippet">${res.snippet}</div>
+    </a>
+  `).join('');
+
+  elements.searchResults.querySelectorAll('.search-result-item').forEach(item => {
+    item.addEventListener('click', (e) => {
+      e.preventDefault();
+      const date = item.dataset.date;
+      setHashDate(date);
+      closeSearch();
+    });
+  });
+}
+
+function initSearch() {
+  if (!elements.searchBtn) return;
+  
+  elements.searchBtn.addEventListener('click', openSearch);
+  elements.closeSearchBtn.addEventListener('click', closeSearch);
+  elements.searchBackdrop.addEventListener('click', closeSearch);
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !elements.searchModal.hidden) {
+      closeSearch();
+    }
+    if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+      e.preventDefault();
+      openSearch();
+    }
+  });
+
+  elements.searchInput.addEventListener('input', (e) => {
+    clearTimeout(searchDebounceTimeout);
+    searchDebounceTimeout = setTimeout(() => {
+      performSearch(e.target.value);
+    }, 250);
+  });
+}
+
 initTheme();
+initSearch();
 loadManifest();
