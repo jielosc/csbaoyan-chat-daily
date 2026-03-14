@@ -8,7 +8,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
 PUBLIC_REPORTS_DIR = ROOT / "pages" / "data" / "reports"
-PUBLIC_EXTRACTED_DIR = ROOT / "pages" / "data" / "extracted"
 
 EMAIL_PATTERN = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 URL_PATTERN = re.compile(
@@ -37,7 +36,7 @@ def scan_text(path: Path, text: str) -> list[str]:
     return issues
 
 
-def list_tracked_files(pathspec: str) -> list[str]:
+def _list_tracked_files(pathspec: str) -> list[str]:
     try:
         result = subprocess.run(
             ["git", "ls-files", pathspec],
@@ -57,11 +56,11 @@ def main() -> int:
 
     issues: list[str] = []
 
-    tracked_public_extracted = list_tracked_files("pages/data/extracted")
+    tracked_public_extracted = _list_tracked_files("pages/data/extracted")
     if tracked_public_extracted:
         issues.append("pages/data/extracted still has tracked public intermediate files")
 
-    tracked_transcripts = list_tracked_files("internal/transcripts")
+    tracked_transcripts = _list_tracked_files("internal/transcripts")
     if tracked_transcripts:
         issues.append("internal/transcripts still has tracked internal transcript files")
 

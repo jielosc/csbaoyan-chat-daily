@@ -84,6 +84,7 @@ def call_llm_with_retry(
 
     raise RuntimeError(f"LLM 调用最终失败：{last_error}") from last_error
 
+
 def summarize_chunk(
     chunk: ChatChunk,
     client: Any,
@@ -148,13 +149,14 @@ def extract_all_chunks(
                 results.append(future.result())
 
     results.sort(key=lambda item: item[0])
+    extracted_path.write_text(
+        "".join(
+            f"# Chunk {chunk_index}\n\n- 时间范围：{start_time} - {end_time}\n\n{summary}\n\n"
+            for chunk_index, start_time, end_time, summary in results
+        ),
+        encoding="utf-8",
+    )
 
-    with extracted_path.open("w", encoding="utf-8") as handle:
-        for chunk_index, start_time, end_time, summary in results:
-            handle.write(f"# Chunk {chunk_index}\n\n")
-            handle.write(f"- 时间范围：{start_time} - {end_time}\n\n")
-            handle.write(summary)
-            handle.write("\n\n")
 
 def generate_final_report(
     extracted_path: Path,

@@ -15,9 +15,9 @@ from file_utils import (
     load_chat_export,
     prepare_output_paths,
     validate_report_date,
+    write_reports_manifest,
 )
 from report_generation import create_openai_client, extract_all_chunks, generate_final_report
-from sync_pages_data import sync_pages_data
 
 
 DEFAULT_EXPORT_DIR = EXPORT_DIR
@@ -93,11 +93,12 @@ def main() -> int:
             temperature=args.temperature,
         )
 
-        sync_pages_data(site_dir=PAGES_DIR)
+        manifest = write_reports_manifest(PAGES_DIR)
 
         logging.info("中间提取结果：%s", extracted_path)
         logging.info("脱敏聊天记录：%s", transcript_path)
         logging.info("最终日报：%s", report_path)
+        logging.info("站点索引已刷新，共 %s 篇日报", len(manifest))
         return 0
     except Exception as exc:
         logging.exception("生成日报失败：%s", exc)
