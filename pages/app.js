@@ -90,7 +90,7 @@ function renderArchive() {
 function updateHeader(item) {
   elements.activeDateLabel.textContent = `日报日期 ${formatDate(item.date)}`;
   elements.reportCount.textContent = `${state.manifest.length} 篇日报`;
-  document.title = `${item.date} | 保研日报档案馆`;
+  document.title = `${item.date} | 绿群日报`;
 }
 
 async function loadReport(date) {
