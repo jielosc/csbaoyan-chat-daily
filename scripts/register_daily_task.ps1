@@ -16,7 +16,7 @@ if ($PythonCommand) {
     $arguments += " -PythonCommand `"$escapedPythonCommand`""
 }
 
-$runAt = [DateTime]::Today.Add([TimeSpan]::ParseExact($Time, "HH\:mm", $null))
+$runAt = [DateTime]::ParseExact($Time, "HH:mm", [System.Globalization.CultureInfo]::InvariantCulture)
 $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
 
 $action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments
