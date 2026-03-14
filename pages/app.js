@@ -9,7 +9,30 @@ const elements = {
   activeDateLabel: document.querySelector("#active-date-label"),
   loadingState: document.querySelector("#loading-state"),
   reportContent: document.querySelector("#report-content"),
+  themeToggle: document.querySelector("#theme-toggle"),
 };
+
+function updateThemeIcon(theme) {
+  if (!elements.themeToggle) return;
+  const isDark = theme === 'dark';
+  elements.themeToggle.querySelector('.icon-sun').style.display = isDark ? 'none' : 'block';
+  elements.themeToggle.querySelector('.icon-moon').style.display = isDark ? 'block' : 'none';
+}
+
+function initTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+  updateThemeIcon(currentTheme);
+
+  if (elements.themeToggle) {
+    elements.themeToggle.addEventListener('click', () => {
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const newTheme = isDark ? 'light' : 'dark';
+      document.documentElement.setAttribute('data-theme', newTheme);
+      localStorage.setItem('theme', newTheme);
+      updateThemeIcon(newTheme);
+    });
+  }
+}
 
 function getHashDate() {
   return window.location.hash.replace(/^#/, "").trim();
@@ -178,4 +201,5 @@ window.addEventListener("hashchange", () => {
   loadReport(targetDate);
 });
 
+initTheme();
 loadManifest();
