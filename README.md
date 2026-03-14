@@ -58,3 +58,23 @@ qq 聊天记录导出环节使用了开源工具：
 欢迎提 issue、分享想法、提改进建议，也欢迎直接发 PR，一起把这份日报做得更稳、更准、更有用。
 
 项目在运行过程中会消耗大量 tokens。如果你觉得它对你有帮助，也欢迎点一个 Star 支持一下。
+
+## 自动化运行
+
+可以用 `scripts/daily_pipeline.ps1` 跑完整的日报生成流程。这个脚本现在会把每次执行的完整输出写到 `logs/daily_pipeline_*.log`，并且会在生成前、推送前都检查本地分支是否和 `origin/<current-branch>` 保持同步，避免静默 push 失败。
+
+如果你要注册 Windows 计划任务，默认命令是：
+
+```powershell
+powershell -ExecutionPolicy Bypass -File .\scripts\register_daily_task.ps1 -PythonCommand "C:\Python311\python.exe"
+```
+
+如果你希望在“未登录 Windows”时也继续执行，需要在注册任务时保存当前 Windows 账户密码：
+
+```powershell
+$env:CSBAOYAN_TASK_PASSWORD = "你的 Windows 登录密码"
+powershell -ExecutionPolicy Bypass -File .\scripts\register_daily_task.ps1 -RunWhenSignedOut -PythonCommand "C:\Python311\python.exe"
+Remove-Item Env:CSBAOYAN_TASK_PASSWORD
+```
+
+不保存密码时，任务只能在你已经登录系统的情况下运行。

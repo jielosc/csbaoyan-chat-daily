@@ -1,7 +1,9 @@
 param(
     [string]$TaskName = "CSBaoyanDailyReport",
     [string]$Time = "06:30",
-    [string]$PythonCommand
+    [string]$PythonCommand,
+    [string]$Password,
+    [switch]$RunWhenSignedOut
 )
 
 Set-StrictMode -Version Latest
@@ -18,16 +20,33 @@ if ($PythonCommand) {
 
 $runAt = [DateTime]::ParseExact($Time, "HH:mm", [System.Globalization.CultureInfo]::InvariantCulture)
 $currentUser = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+$workingDirectory = Split-Path -Parent $pipelineScript
 
-$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments
+$action = New-ScheduledTaskAction -Execute "powershell.exe" -Argument $arguments -WorkingDirectory $workingDirectory
 $trigger = New-ScheduledTaskTrigger -Daily -At $runAt
 $settings = New-ScheduledTaskSettingsSet -StartWhenAvailable -WakeToRun -AllowStartIfOnBatteries -DontStopIfGoingOnBatteries
-$principal = New-ScheduledTaskPrincipal -UserId $currentUser -LogonType Interactive -RunLevel Limited
 
-Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
+if ($RunWhenSignedOut) {
+    $taskPassword = if ($Password) { $Password } else { $env:CSBAOYAN_TASK_PASSWORD }
+    if (-not $taskPassword) {
+        throw "RunWhenSignedOut requires a password. Pass -Password or set the CSBAOYAN_TASK_PASSWORD environment variable before registering the task."
+    }
+
+    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -User $currentUser -Password $taskPassword -RunLevel Limited -Force | Out-Null
+}
+else {
+    $principal = New-ScheduledTaskPrincipal -UserId $currentUser -LogonType Interactive -RunLevel Limited
+    Register-ScheduledTask -TaskName $TaskName -Action $action -Trigger $trigger -Settings $settings -Principal $principal -Force | Out-Null
+}
 
 Write-Host "Task created: $TaskName"
 Write-Host "Schedule: daily at $Time"
 Write-Host "User: $currentUser"
 Write-Host "Script: $pipelineScript"
-Write-Host "Note: this task is configured for an interactive logon. If you need it to run while signed out, change it in Task Scheduler and store the password."
+if ($RunWhenSignedOut) {
+    Write-Host "Logon: runs whether you are signed in or not."
+}
+else {
+    Write-Host "Logon: interactive only."
+    Write-Host "Note: if you need it to run while signed out, re-register it with -RunWhenSignedOut and a password."
+}
