@@ -21,24 +21,43 @@ const elements = {
   searchResults: document.querySelector("#search-results"),
 };
 
-function updateThemeIcon(theme) {
+function updateThemeIcon(themeSetting) {
   if (!elements.themeToggle) return;
-  const isDark = theme === 'dark';
-  elements.themeToggle.querySelector('.icon-sun').style.display = isDark ? 'none' : 'block';
-  elements.themeToggle.querySelector('.icon-moon').style.display = isDark ? 'block' : 'none';
+  elements.themeToggle.querySelector('.icon-sun').style.display = themeSetting === 'light' ? 'block' : 'none';
+  elements.themeToggle.querySelector('.icon-moon').style.display = themeSetting === 'dark' ? 'block' : 'none';
+  const iconSystem = elements.themeToggle.querySelector('.icon-system');
+  if (iconSystem) {
+    iconSystem.style.display = themeSetting === 'system' ? 'block' : 'none';
+  }
+}
+
+function applyTheme(themeSetting) {
+  const isDark = themeSetting === 'dark' || (themeSetting === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+  document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 }
 
 function initTheme() {
-  const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-  updateThemeIcon(currentTheme);
+  let currentSetting = localStorage.getItem('theme') || 'system';
+  applyTheme(currentSetting);
+  updateThemeIcon(currentSetting);
+
+  window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+    if ((localStorage.getItem('theme') || 'system') === 'system') {
+      applyTheme('system');
+    }
+  });
 
   if (elements.themeToggle) {
     elements.themeToggle.addEventListener('click', () => {
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-      const newTheme = isDark ? 'light' : 'dark';
-      document.documentElement.setAttribute('data-theme', newTheme);
-      localStorage.setItem('theme', newTheme);
-      updateThemeIcon(newTheme);
+      let current = localStorage.getItem('theme') || 'system';
+      let nextSetting = 'system';
+      if (current === 'system') nextSetting = 'light';
+      else if (current === 'light') nextSetting = 'dark';
+      else nextSetting = 'system';
+
+      localStorage.setItem('theme', nextSetting);
+      applyTheme(nextSetting);
+      updateThemeIcon(nextSetting);
     });
   }
 }
