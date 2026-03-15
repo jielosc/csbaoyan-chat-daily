@@ -302,11 +302,19 @@ button.status-chip svg {
   opacity: 0;
   transform: translateY(8px);
   transition: opacity 220ms ease, transform 220ms ease;
+  overflow-wrap: break-word;
+  word-break: break-word;
 }
 
 .report-content.ready {
   opacity: 1;
   transform: translateY(0);
+}
+
+.report-content img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius-md);
 }
 
 .loading-state {
@@ -448,10 +456,11 @@ button.status-chip svg {
 }
 
 .report-content table {
+  display: block;
   width: 100%;
   border-collapse: collapse;
   margin: 1.4em 0;
-  overflow: hidden;
+  overflow-x: auto;
   border-radius: var(--radius-md);
 }
 
@@ -494,7 +503,7 @@ button.status-chip svg {
 
   .hero,
   .layout {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
     display: grid;
   }
 
