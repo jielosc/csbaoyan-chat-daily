@@ -2,6 +2,8 @@
 
 CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）每日 AI 信息总结（非官方）
 
+内容覆盖时间范围为：05:00 ~ 次日05:00，每天 6:30 自动更新
+
 在线查看 Pages：
 
 - https://jielosc.github.io/csbaoyan-chat-daily
