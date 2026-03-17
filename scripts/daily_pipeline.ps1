@@ -126,6 +126,39 @@ function Get-UpstreamStatus {
     }
 }
 
+function Test-WorkingTreeClean {
+    $pendingChanges = (& git status --porcelain)
+    return (-not $pendingChanges)
+}
+
+function Sync-UpstreamIfBehind {
+    param(
+        [string]$Branch,
+        [string]$Phase
+    )
+
+    $status = Get-UpstreamStatus -Branch $Branch
+    if (-not $status.HasUpstream) {
+        return $status
+    }
+
+    if ($status.Behind -le 0) {
+        return $status
+    }
+
+    if ($status.Ahead -gt 0) {
+        throw "Local branch diverged from origin/$Branch during $Phase (ahead=$($status.Ahead), behind=$($status.Behind)). Resolve it manually before running the daily pipeline."
+    }
+
+    if (-not (Test-WorkingTreeClean)) {
+        throw "Local branch is behind origin/$Branch during $Phase, but the working tree is not clean. Commit or stash local changes, then rerun the daily pipeline."
+    }
+
+    Write-Step "Local branch is behind origin/$Branch by $($status.Behind) commit(s); fast-forwarding before $Phase"
+    Invoke-Git -Arguments @("pull", "--ff-only", "origin", $Branch) -ErrorMessage "git pull --ff-only failed."
+    return Get-UpstreamStatus -Branch $Branch
+}
+
 function Assert-UpstreamSynced {
     param(
         [string]$Branch,
@@ -133,7 +166,7 @@ function Assert-UpstreamSynced {
         [switch]$AllowAhead
     )
 
-    $status = Get-UpstreamStatus -Branch $Branch
+    $status = Sync-UpstreamIfBehind -Branch $Branch -Phase $Phase
     if (-not $status.HasUpstream) {
         return
     }
