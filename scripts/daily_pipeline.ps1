@@ -196,6 +196,8 @@ function Invoke-Main {
         Assert-UpstreamSynced -Branch $branch -Phase "preflight"
     }
 
+    # generate_daily_report.py performs multiple LLM/API calls and usually takes about 3-5 minutes.
+    # Treat it as a long-running step; brief periods without new log output are expected.
     if (-not $SkipGenerate) {
         Write-Step "Running generate_daily_report.py"
         Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("generate_daily_report.py")
