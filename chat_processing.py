@@ -27,6 +27,13 @@ URL_PATTERN = re.compile(
 )
 PHONE_PATTERN = re.compile(r"(?<!\d)(?:\+?86[- ]?)?1[3-9]\d{9}(?!\d)")
 CONTACT_ID_PATTERN = re.compile(r"(?i)\b(?:qq|vx|wechat|weixin|微信)[:： ]*[A-Za-z0-9_-]{5,}\b")
+PUBLIC_ALIAS_RULES = (
+    {
+        "alias": "夕颜",
+        "uid": "u_I7GbXJlBNyKvJIKuoZ4dXw",
+        "uin": "3352037245",
+    },
+)
 
 
 def should_register_suffix_alias(suffix: str) -> bool:
@@ -94,6 +101,16 @@ class AliasResolver:
         text = str(value).strip()
         return text or None
 
+    def _get_public_alias(self, uid: Any = None, uin: Any = None) -> str | None:
+        uid_text = self._clean_token(uid)
+        uin_text = self._clean_token(uin)
+        for rule in PUBLIC_ALIAS_RULES:
+            if uid_text and uid_text == rule.get("uid"):
+                return str(rule["alias"])
+            if uin_text and uin_text == rule.get("uin"):
+                return str(rule["alias"])
+        return None
+
     def register(self, uid: Any = None, uin: Any = None, name: Any = None) -> str | None:
         uid_text = self._clean_token(uid)
         uin_text = self._clean_token(uin)
@@ -104,7 +121,7 @@ class AliasResolver:
 
         alias = self.alias_by_canonical.get(canonical)
         if alias is None:
-            alias = f"User_{len(self.alias_by_canonical) + 1}"
+            alias = self._get_public_alias(uid_text, uin_text) or f"User_{len(self.alias_by_canonical) + 1}"
             self.alias_by_canonical[canonical] = alias
 
         if uid_text:
