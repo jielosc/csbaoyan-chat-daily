@@ -4,10 +4,17 @@ const state = {
   abortController: null,
   reportsCache: {},
   isSearching: false,
+  dateSwitcherOpen: false,
 };
 
 const elements = {
-  archiveList: document.querySelector("#archive-list"),
+  dateSwitcher: document.querySelector("#date-switcher"),
+  prevDateBtn: document.querySelector("#prev-date-btn"),
+  nextDateBtn: document.querySelector("#next-date-btn"),
+  currentDateBtn: document.querySelector("#current-date-btn"),
+  dateSwitcherCurrent: document.querySelector("#date-switcher-current"),
+  dateSwitcherPopover: document.querySelector("#date-switcher-popover"),
+  dateSwitcherList: document.querySelector("#date-switcher-list"),
   reportCount: document.querySelector("#report-count"),
   activeDateLabel: document.querySelector("#active-date-label"),
   loadingState: document.querySelector("#loading-state"),
@@ -111,50 +118,103 @@ function renderMarkdown(markdownText) {
   return window.DOMPurify.sanitize(rawHtml);
 }
 
-function renderArchive() {
-  if (!state.manifest.length) {
-    elements.archiveList.innerHTML = '<div class="empty-state">暂无可展示的日报。</div>';
+function getActiveIndex() {
+  return state.manifest.findIndex((item) => item.date === state.activeDate);
+}
+
+function setDateSwitcherOpen(isOpen) {
+  state.dateSwitcherOpen = isOpen;
+
+  if (elements.dateSwitcherPopover) {
+    elements.dateSwitcherPopover.hidden = !isOpen;
+  }
+
+  if (elements.dateSwitcher) {
+    elements.dateSwitcher.classList.toggle("open", isOpen);
+  }
+
+  for (const button of [elements.currentDateBtn]) {
+    if (button) {
+      button.setAttribute("aria-expanded", String(isOpen));
+    }
+  }
+}
+
+function closeDateSwitcher() {
+  if (!state.dateSwitcherOpen) {
+    return;
+  }
+  setDateSwitcherOpen(false);
+}
+
+function toggleDateSwitcher() {
+  if (!elements.dateSwitcherPopover) {
+    return;
+  }
+  setDateSwitcherOpen(!state.dateSwitcherOpen);
+}
+
+function navigateDate(offset) {
+  const activeIndex = getActiveIndex();
+  if (activeIndex === -1) return;
+
+  const nextItem = state.manifest[activeIndex + offset];
+  if (nextItem) {
+    setHashDate(nextItem.date);
+  }
+}
+
+function renderDateSwitcher() {
+  if (!elements.dateSwitcherList || !elements.dateSwitcherCurrent) {
     return;
   }
 
-  const existingItems = elements.archiveList.querySelectorAll(".archive-item");
-  if (existingItems.length === state.manifest.length) {
-    for (const button of existingItems) {
-      const isActive = button.dataset.date === state.activeDate;
-      if (isActive) {
-        button.classList.add("active");
-        button.setAttribute("aria-pressed", "true");
-      } else {
-        button.classList.remove("active");
-        button.setAttribute("aria-pressed", "false");
+  if (!state.manifest.length) {
+    elements.dateSwitcherCurrent.textContent = "暂无日报";
+    elements.dateSwitcherList.innerHTML = '<div class="date-switcher-empty">暂无可展示的日报。</div>';
+    for (const button of [elements.prevDateBtn, elements.nextDateBtn, elements.currentDateBtn]) {
+      if (button) {
+        button.disabled = true;
       }
     }
+    elements.currentDateBtn?.setAttribute("aria-label", "当前日报日期，暂无可展示的日报");
+    closeDateSwitcher();
     return;
   }
 
-  elements.archiveList.innerHTML = state.manifest
+  const activeIndex = getActiveIndex();
+  const activeItem = state.manifest[activeIndex] ?? state.manifest[0];
+  const resolvedIndex = activeIndex === -1 ? 0 : activeIndex;
+
+  elements.dateSwitcherCurrent.textContent = formatDate(activeItem.date);
+  elements.currentDateBtn?.setAttribute("aria-label", `当前日报 ${formatDate(activeItem.date)}，打开日期列表`);
+
+  if (elements.prevDateBtn) {
+    elements.prevDateBtn.disabled = resolvedIndex >= state.manifest.length - 1;
+  }
+  if (elements.nextDateBtn) {
+    elements.nextDateBtn.disabled = resolvedIndex <= 0;
+  }
+  for (const button of [elements.currentDateBtn]) {
+    if (button) {
+      button.disabled = false;
+    }
+  }
+
+  elements.dateSwitcherList.innerHTML = state.manifest
     .map((item) => {
-      const isActive = item.date === state.activeDate;
+      const isActive = item.date === activeItem.date;
       return `
-        <button class="archive-item${isActive ? " active" : ""}" data-date="${item.date}" type="button" aria-pressed="${isActive}">
-          <span class="archive-date">${formatDate(item.date)}</span>
+        <button class="date-switcher-item${isActive ? " active" : ""}" data-date="${item.date}" type="button" aria-pressed="${isActive}">
+          <span class="date-switcher-item-date">${formatDate(item.date)}</span>
         </button>
       `;
     })
     .join("");
-
-  for (const button of elements.archiveList.querySelectorAll(".archive-item")) {
-    button.addEventListener("click", () => {
-      const { date } = button.dataset;
-      if (date) {
-        setHashDate(date);
-      }
-    });
-  }
 }
 
 function updateHeader(item) {
-  elements.activeDateLabel.textContent = `日报日期 ${formatDate(item.date)}`;
+  elements.activeDateLabel.textContent = "内容覆盖 05:00 至次日 05:00，每天 06:30 自动更新";
   elements.reportCount.textContent = `${state.manifest.length} 篇日报`;
   document.title = `${item.date} | 绿群日报`;
 }
@@ -168,8 +228,9 @@ async function loadReport(date) {
   }
 
   state.activeDate = item.date;
-  renderArchive();
   updateHeader(item);
+  renderDateSwitcher();
+  closeDateSwitcher();
   showLoading(true);
 
   if (state.abortController) {
@@ -215,7 +276,7 @@ async function loadManifest() {
     if (!Array.isArray(state.manifest) || !state.manifest.length) {
       elements.reportCount.textContent = "0 篇日报";
       showLoading(false);
-      renderArchive();
+      renderDateSwitcher();
       showMessage("empty-state", "还没有可展示的日报，等下一次生成后这里会自动更新。");
       return;
     }
@@ -233,7 +294,7 @@ async function loadManifest() {
     console.error(error);
     elements.reportCount.textContent = "读取失败";
     showLoading(false);
-    elements.archiveList.innerHTML = '<div class="error-state">归档索引加载失败。</div>';
+    renderDateSwitcher();
     showMessage("error-state", "日报索引加载失败，请确认 pages/data 已成功生成。");
   }
 }
@@ -251,10 +312,41 @@ window.addEventListener("hashchange", () => {
   loadReport(targetDate);
 });
 
+function initDateSwitcher() {
+  renderDateSwitcher();
+  elements.prevDateBtn?.addEventListener("click", () => navigateDate(1));
+  elements.nextDateBtn?.addEventListener("click", () => navigateDate(-1));
+  elements.currentDateBtn?.addEventListener("click", toggleDateSwitcher);
+
+  elements.dateSwitcherList?.addEventListener("click", (event) => {
+    const target = event.target instanceof Element ? event.target : null;
+    const button = target?.closest(".date-switcher-item");
+    if (!(button instanceof HTMLElement)) {
+      return;
+    }
+    const { date } = button.dataset;
+    if (!date) {
+      return;
+    }
+    setHashDate(date);
+    closeDateSwitcher();
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!state.dateSwitcherOpen || !elements.dateSwitcher) {
+      return;
+    }
+    if (!(event.target instanceof Node) || !elements.dateSwitcher.contains(event.target)) {
+      closeDateSwitcher();
+    }
+  });
+}
+
 // --- Search Functionality ---
 let searchDebounceTimeout = null;
 
 function openSearch() {
+  closeDateSwitcher();
   elements.searchModal.hidden = false;
   elements.searchInput.focus();
   prefetchAllReports();
@@ -357,6 +449,9 @@ function initSearch() {
   elements.searchBackdrop.addEventListener('click', closeSearch);
   
   document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && state.dateSwitcherOpen) {
+      closeDateSwitcher();
+    }
     if (e.key === 'Escape' && !elements.searchModal.hidden) {
       closeSearch();
     }
@@ -375,5 +470,6 @@ function initSearch() {
 }
 
 initTheme();
+initDateSwitcher();
 initSearch();
 loadManifest();
