@@ -35,7 +35,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--chunk-max-messages", type=int, default=600, help="Maximum message count per chunk.")
     parser.add_argument("--chunk-overlap-messages", type=int, default=30, help="Number of overlapping messages between adjacent chunks.")
     parser.add_argument("--retries", type=int, default=3, help="Maximum retry count for failed LLM calls.")
-    parser.add_argument("--timeout", type=float, default=60.0, help="LLM request timeout in seconds.")
+    parser.add_argument("--timeout", type=float, default=120.0, help="LLM request timeout in seconds.")
     parser.add_argument("--final-timeout", type=float, default=300.0, help="Timeout in seconds for the final aggregation request.")
     parser.add_argument("--temperature", type=float, default=0.2, help="Sampling temperature for the LLM.")
     parser.add_argument("--max-workers", type=int, default=4, help="Worker count for chunk extraction.")
