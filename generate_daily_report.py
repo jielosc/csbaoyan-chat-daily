@@ -36,6 +36,7 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument("--chunk-overlap-messages", type=int, default=30, help="Number of overlapping messages between adjacent chunks.")
     parser.add_argument("--retries", type=int, default=3, help="Maximum retry count for failed LLM calls.")
     parser.add_argument("--timeout", type=float, default=60.0, help="LLM request timeout in seconds.")
+    parser.add_argument("--final-timeout", type=float, default=300.0, help="Timeout in seconds for the final aggregation request.")
     parser.add_argument("--temperature", type=float, default=0.2, help="Sampling temperature for the LLM.")
     parser.add_argument("--max-workers", type=int, default=4, help="Worker count for chunk extraction.")
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL, help="Optional custom base URL for an OpenAI-compatible API.")
@@ -64,7 +65,8 @@ def main() -> int:
         extracted_path, report_path, transcript_path = prepare_output_paths(PAGES_DIR, report_date)
         write_anonymized_transcript(anonymized_messages, transcript_path)
 
-        client = create_openai_client(args.api_key, args.base_url, args.timeout)
+        extraction_client = create_openai_client(args.api_key, args.base_url, args.timeout)
+        final_client = create_openai_client(args.api_key, args.base_url, args.final_timeout)
 
         if args.date:
             logging.info("使用日期 %s 的导出文件：%s", args.date, export_file)
@@ -73,11 +75,12 @@ def main() -> int:
         else:
             logging.info("使用最新导出文件：%s", export_file)
         logging.info("脱敏后消息数：%s，Chunk 数：%s", len(anonymized_messages), len(chunks))
+        logging.info("LLM 超时设置：分块提取 %ss，最终汇总 %ss", args.timeout, args.final_timeout)
 
         extract_all_chunks(
             chunks=chunks,
             extracted_path=extracted_path,
-            client=client,
+            client=extraction_client,
             model=args.model,
             retries=args.retries,
             temperature=args.temperature,
@@ -87,7 +90,7 @@ def main() -> int:
         generate_final_report(
             extracted_path=extracted_path,
             final_report_path=report_path,
-            client=client,
+            client=final_client,
             model=args.model,
             retries=args.retries,
             temperature=args.temperature,
