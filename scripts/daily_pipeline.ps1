@@ -74,8 +74,31 @@ function Invoke-RepoPython {
         [string[]]$Arguments
     )
 
-    & $PythonSpec.Command @($PythonSpec.PrefixArgs) @Arguments
-    if ($LASTEXITCODE -ne 0) {
+    $previousPythonUnbuffered = $env:PYTHONUNBUFFERED
+    $exitCode = 0
+
+    try {
+        $env:PYTHONUNBUFFERED = "1"
+        & $PythonSpec.Command @($PythonSpec.PrefixArgs) @Arguments 2>&1 | ForEach-Object {
+            if ($_ -is [System.Management.Automation.ErrorRecord]) {
+                Write-Host $_.ToString()
+            }
+            else {
+                Write-Host $_
+            }
+        }
+        $exitCode = $LASTEXITCODE
+    }
+    finally {
+        if ($null -eq $previousPythonUnbuffered) {
+            Remove-Item Env:PYTHONUNBUFFERED -ErrorAction SilentlyContinue
+        }
+        else {
+            $env:PYTHONUNBUFFERED = $previousPythonUnbuffered
+        }
+    }
+
+    if ($exitCode -ne 0) {
         throw "Command failed: $($Arguments -join ' ')"
     }
 }
