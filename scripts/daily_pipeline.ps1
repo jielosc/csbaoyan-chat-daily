@@ -75,10 +75,12 @@ function Invoke-RepoPython {
     )
 
     $previousPythonUnbuffered = $env:PYTHONUNBUFFERED
+    $previousPythonIOEncoding = $env:PYTHONIOENCODING
     $exitCode = 0
-
+ 
     try {
         $env:PYTHONUNBUFFERED = "1"
+        $env:PYTHONIOENCODING = "utf-8"
         & $PythonSpec.Command @($PythonSpec.PrefixArgs) @Arguments 2>&1 | ForEach-Object {
             if ($_ -is [System.Management.Automation.ErrorRecord]) {
                 Write-Host $_.ToString()
@@ -95,6 +97,13 @@ function Invoke-RepoPython {
         }
         else {
             $env:PYTHONUNBUFFERED = $previousPythonUnbuffered
+        }
+
+        if ($null -eq $previousPythonIOEncoding) {
+            Remove-Item Env:PYTHONIOENCODING -ErrorAction SilentlyContinue
+        }
+        else {
+            $env:PYTHONIOENCODING = $previousPythonIOEncoding
         }
     }
 
