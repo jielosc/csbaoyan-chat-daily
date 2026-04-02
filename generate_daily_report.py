@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import datetime as dt
 import logging
 import sys
 from pathlib import Path
@@ -10,7 +11,6 @@ from chat_processing import anonymize_messages, chunk_messages, write_anonymized
 from file_utils import (
     extract_messages,
     get_json_file_by_date,
-    get_latest_json_file,
     infer_report_date,
     load_chat_export,
     prepare_output_paths,
@@ -53,7 +53,8 @@ def main() -> int:
     )
 
     try:
-        export_file = get_json_file_by_date(args.export_dir, args.date) if args.date else get_latest_json_file(args.export_dir)
+        target_date = args.date or (dt.date.today() - dt.timedelta(days=1)).strftime("%Y-%m-%d")
+        export_file = get_json_file_by_date(args.export_dir, target_date)
         payload = load_chat_export(export_file)
         messages = extract_messages(payload)
         anonymized_messages = anonymize_messages(messages)
@@ -72,12 +73,9 @@ def main() -> int:
         extraction_client = create_openai_client(args.api_key, args.base_url, args.timeout)
         final_client = create_openai_client(args.api_key, args.base_url, args.final_timeout)
 
-        if args.date:
-            logging.info("使用日期 %s 的导出文件：%s", args.date, export_file)
-            if inferred_report_date != args.date:
-                logging.warning("指定日期为 %s，但导出内容推断日期为 %s，将按指定日期输出。", args.date, inferred_report_date)
-        else:
-            logging.info("使用最新导出文件：%s", export_file)
+        logging.info("使用日期 %s 的导出文件：%s", target_date, export_file)
+        if inferred_report_date != target_date:
+            logging.warning("目标日期为 %s，但导出内容推断日期为 %s，将按目标日期输出。", target_date, inferred_report_date)
         logging.info("脱敏后消息数：%s，Chunk 数：%s", len(anonymized_messages), len(chunks))
         logging.info("LLM 超时设置：分块提取 %ss，最终汇总 %ss", args.timeout, args.final_timeout)
 

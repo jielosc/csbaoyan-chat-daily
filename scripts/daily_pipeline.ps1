@@ -76,9 +76,17 @@ function Invoke-RepoPython {
 
     $previousPythonUnbuffered = $env:PYTHONUNBUFFERED
     $previousPythonIOEncoding = $env:PYTHONIOENCODING
+    $previousConsoleOutputEncoding = [Console]::OutputEncoding
+    $previousConsoleInputEncoding = [Console]::InputEncoding
+    $previousOutputEncoding = $OutputEncoding
     $exitCode = 0
  
     try {
+        $utf8NoBom = [System.Text.UTF8Encoding]::new($false)
+        [Console]::OutputEncoding = $utf8NoBom
+        [Console]::InputEncoding = $utf8NoBom
+        $OutputEncoding = $utf8NoBom
+
         $env:PYTHONUNBUFFERED = "1"
         $env:PYTHONIOENCODING = "utf-8"
         & $PythonSpec.Command @($PythonSpec.PrefixArgs) @Arguments 2>&1 | ForEach-Object {
@@ -105,6 +113,10 @@ function Invoke-RepoPython {
         else {
             $env:PYTHONIOENCODING = $previousPythonIOEncoding
         }
+
+        [Console]::OutputEncoding = $previousConsoleOutputEncoding
+        [Console]::InputEncoding = $previousConsoleInputEncoding
+        $OutputEncoding = $previousOutputEncoding
     }
 
     if ($exitCode -ne 0) {
