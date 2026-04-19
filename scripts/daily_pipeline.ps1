@@ -145,14 +145,14 @@ function Get-UpstreamStatus {
     $null = & git rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>$null
     $hasUpstream = ($LASTEXITCODE -eq 0)
     if (-not $hasUpstream) {
-        return @{
+        return [pscustomobject]@{
             HasUpstream = $false
             Ahead = 0
             Behind = 0
         }
     }
 
-    Invoke-Git -Arguments @("fetch", "origin", $Branch) -ErrorMessage "git fetch failed."
+    $null = Invoke-Git -Arguments @("fetch", "origin", $Branch) -ErrorMessage "git fetch failed."
     $counts = (& git rev-list --left-right --count "HEAD...origin/$Branch").Trim()
     if (-not $counts) {
         throw "Could not determine branch divergence against origin/$Branch."
@@ -163,7 +163,7 @@ function Get-UpstreamStatus {
         throw "Unexpected git rev-list output: $counts"
     }
 
-    return @{
+    return [pscustomobject]@{
         HasUpstream = $true
         Ahead = [int]$parts[0]
         Behind = [int]$parts[1]
@@ -199,7 +199,7 @@ function Sync-UpstreamIfBehind {
     }
 
     Write-Step "Local branch is behind origin/$Branch by $($status.Behind) commit(s); fast-forwarding before $Phase"
-    Invoke-Git -Arguments @("pull", "--ff-only", "origin", $Branch) -ErrorMessage "git pull --ff-only failed."
+    $null = Invoke-Git -Arguments @("pull", "--ff-only", "origin", $Branch) -ErrorMessage "git pull --ff-only failed."
     return Get-UpstreamStatus -Branch $Branch
 }
 
