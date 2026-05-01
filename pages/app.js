@@ -348,12 +348,14 @@ let searchDebounceTimeout = null;
 function openSearch() {
   closeDateSwitcher();
   elements.searchModal.hidden = false;
+  elements.searchModal.setAttribute('aria-hidden', 'false');
   elements.searchInput.focus();
   prefetchAllReports();
 }
 
 function closeSearch() {
   elements.searchModal.hidden = true;
+  elements.searchModal.setAttribute('aria-hidden', 'true');
   elements.searchInput.value = '';
   elements.searchResults.innerHTML = '<div class="search-placeholder">输入关键词开始搜索...</div>';
 }
