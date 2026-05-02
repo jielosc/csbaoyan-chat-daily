@@ -10,7 +10,9 @@ assert.match(indexHtml, /id="reader-view"/, "index.html should wrap the report r
 assert.match(indexHtml, /id="read-latest-btn"/, "homepage should expose a read-latest action");
 assert.match(indexHtml, /id="recent-reports-list"/, "homepage should expose a recent reports list");
 assert.match(indexHtml, /id="home-link"/, "header brand area should expose a home link");
+assert.match(indexHtml, /class="home-actions"\s+role="group"\s+aria-label="快捷入口"/, "quick actions should expose a named group");
 assert.match(indexHtml, /class="contribute-section"/, "homepage should include a contribution section");
+assert.match(indexHtml, /<nav class="contribute-actions" aria-label="反馈与项目链接">/, "contribution actions should be a named navigation landmark");
 assert.match(indexHtml, /github\.com\/jielosc\/csbaoyan-chat-daily\/issues\/new/, "contribution section should link to GitHub issue creation");
 
 assert.match(appJs, /function\s+showHomeView\s*\(/, "app.js should render the no-hash homepage state");
@@ -18,7 +20,9 @@ assert.match(appJs, /function\s+showReaderView\s*\(/, "app.js should render the 
 assert.match(appJs, /function\s+renderHomeView\s*\(/, "app.js should populate homepage data from the manifest");
 assert.match(appJs, /function\s+extractOverview\s*\(/, "app.js should extract overview text from report markdown");
 assert.match(appJs, /function\s+loadRecentReportSummaries\s*\(/, "app.js should load recent report summaries for the homepage");
+assert.ok(appJs.includes(".replace(/^([-+*]|\\d+[.)])\\s+/, \"\")"), "overview extraction should strip markdown list markers");
 assert.match(appJs, /const\s+targetDate\s*=\s*getHashDate\(\)/, "manifest loading should not force a latest-date hash");
+assert.match(appJs, /catch \(error\) \{\s*console\.error\(error\);\s*showReaderView\(\);/s, "manifest load failure should reveal the reader error state");
 
 assert.match(stylesCss, /\.home-view\b/, "styles.css should style the homepage view");
 assert.match(stylesCss, /\.recent-reports-list\b/, "styles.css should style the recent reports list");

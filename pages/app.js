@@ -120,7 +120,10 @@ function extractOverview(markdownText) {
     return "本期概览暂不可用，点击查看日报正文。";
   }
 
-  return overview.replace(/[#*`_>]/g, "").trim();
+  return overview
+    .replace(/^([-+*]|\d+[.)])\s+/, "")
+    .replace(/[#*`_>]/g, "")
+    .trim();
 }
 
 function escapeHtml(text) {
@@ -415,6 +418,7 @@ async function loadManifest() {
     await loadReport(targetDate);
   } catch (error) {
     console.error(error);
+    showReaderView();
     elements.reportCount.textContent = "读取失败";
     showLoading(false);
     renderDateSwitcher();
