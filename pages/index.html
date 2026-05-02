@@ -28,13 +28,13 @@
 <body>
   <div class="site-shell">
     <header class="hero">
-      <div class="hero-copy">
+      <a class="hero-copy hero-home-link" id="home-link" href="./" aria-label="回到主页">
         <p class="eyebrow">CS Baoyan Chat Daily</p>
         <h1>绿群日报</h1>
         <p class="hero-summary">
-          每日 AI 总结绿群信息，打破 CS 保研信息差
+          绿群保研信息提炼：帮你每日快速跟进
         </p>
-      </div>
+      </a>
       <div class="hero-status">
         <a href="https://github.com/jielosc/csbaoyan-chat-daily" target="_blank" rel="noopener noreferrer"
           class="status-chip" aria-label="GitHub Repository">
@@ -59,6 +59,73 @@
 
     <div>
       <main>
+        <section class="home-view" id="home-view" hidden>
+          <div class="home-hero">
+            <div class="home-copy">
+              <h2>把绿群中有用的保研信息，整理成每日可读的一页</h2>
+              <p>
+                绿群日报会从群聊中提取院校项目、夏令营、导师信息、经验观点和待核实风险，帮助没有时间翻完整聊天记录的同学快速跟进。
+              </p>
+            </div>
+            <div class="home-actions" aria-label="快捷入口">
+              <button class="primary-action" id="read-latest-btn" type="button">阅读最新日报</button>
+              <button class="secondary-action" id="home-search-btn" type="button">搜索全部日报</button>
+            </div>
+          </div>
+
+          <section class="home-grid" aria-label="站点概览">
+            <article class="home-panel latest-panel">
+              <p class="home-panel-kicker">Latest</p>
+              <h3>最新日报</h3>
+              <p class="home-panel-value" id="latest-report-date">正在加载...</p>
+              <p class="home-panel-note">查看最新一期群聊摘要，快速了解近期保研项目、导师信息、申请经验和待核实风险。</p>
+            </article>
+            <article class="home-panel">
+              <p class="home-panel-kicker">Archive</p>
+              <h3>日报归档</h3>
+              <p class="home-panel-value" id="home-report-count">0 篇</p>
+              <p class="home-panel-note">可按日期浏览，也可以用搜索定位具体院校、导师或项目关键词。</p>
+            </article>
+            <article class="home-panel">
+              <p class="home-panel-kicker">Verify</p>
+              <h3>谨慎核实</h3>
+              <p class="home-panel-value">AI 整理</p>
+              <p class="home-panel-note">
+                内容由 AI 从群聊中整理归纳，仅供参考。涉及时效性、主观经验和未核实信息时，请以官方通知为准。
+              </p>
+            </article>
+          </section>
+
+          <section class="recent-reports" aria-labelledby="recent-reports-title">
+            <div class="section-head">
+              <p class="reader-label">Recent Reports</p>
+              <h2 id="recent-reports-title">最近日报</h2>
+            </div>
+            <div class="recent-reports-list" id="recent-reports-list">
+              <div class="date-switcher-empty">正在加载最近日报...</div>
+            </div>
+          </section>
+
+          <section class="contribute-section" aria-labelledby="contribute-title">
+            <div class="contribute-copy">
+              <p class="reader-label">Contribute</p>
+              <h2 id="contribute-title">参与改进</h2>
+              <p>
+                绿群日报还在持续迭代。如果你发现内容有误、隐私风险、分类不准，或者希望增加新的浏览方式，欢迎在 GitHub 留下反馈。
+              </p>
+              <p>
+                如果它刚好帮你省下一点翻群聊的时间，也可以顺手点亮 Star，让更多同学发现这份日报。
+              </p>
+            </div>
+            <div class="contribute-actions" aria-label="反馈与项目链接">
+              <a class="secondary-action" href="https://github.com/jielosc/csbaoyan-chat-daily/issues/new?title=%E5%86%85%E5%AE%B9%E9%97%AE%E9%A2%98%EF%BC%9A" target="_blank" rel="noopener noreferrer">反馈问题</a>
+              <a class="secondary-action" href="https://github.com/jielosc/csbaoyan-chat-daily/issues/new?title=%E6%94%B9%E8%BF%9B%E5%BB%BA%E8%AE%AE%EF%BC%9A" target="_blank" rel="noopener noreferrer">提出建议</a>
+              <a class="primary-action" href="https://github.com/jielosc/csbaoyan-chat-daily" target="_blank" rel="noopener noreferrer">查看项目</a>
+            </div>
+          </section>
+        </section>
+
+        <section class="reader-view" id="reader-view" hidden>
         <section class="reader-intro">
           <p class="reader-label" id="active-date-label">内容覆盖 05:00 至次日 05:00，每天 06:30 自动更新</p>
           <section class="date-switcher" id="date-switcher" aria-label="日期切换">
@@ -104,19 +171,17 @@
           </div>
           <article class="report-content" id="report-content"></article>
         </section>
+        </section>
       </main>
     </div>
 
     <footer class="site-footer">
       <div class="footer-links">
-        <span>绿群：<a href="https://github.com/CS-BAOYAN" target="_blank" rel="noopener noreferrer">CS-BAOYAN
-            社区</a></span>
-        <span class="divider" aria-hidden="true">|</span>
-        <span>欢迎 <a href="https://github.com/jielosc/csbaoyan-chat-daily" target="_blank" rel="noopener noreferrer">提交
-            PR 或 Issue</a> 共同维护</span>
+        <span>绿群日报是 <a href="https://github.com/CS-BAOYAN" target="_blank" rel="noopener noreferrer">CS-BAOYAN
+            社区</a>相关群聊信息的非官方整理项目</span>
       </div>
       <p class="disclaimer-note">
-        内容来自群聊并由 AI 整理归纳，仅供参考；涉及时效性、主观经验和未核实内容时，请以官方通知和公开资料为准。
+        内容由 AI 辅助归纳，仅供参考；涉及时效性、主观经验和未核实信息时，请以官方通知和公开资料为准。
       </p>
     </footer>
   </div>

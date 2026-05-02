@@ -8,6 +8,14 @@ const state = {
 };
 
 const elements = {
+  homeLink: document.querySelector("#home-link"),
+  homeView: document.querySelector("#home-view"),
+  readerView: document.querySelector("#reader-view"),
+  readLatestBtn: document.querySelector("#read-latest-btn"),
+  homeSearchBtn: document.querySelector("#home-search-btn"),
+  latestReportDate: document.querySelector("#latest-report-date"),
+  homeReportCount: document.querySelector("#home-report-count"),
+  recentReportsList: document.querySelector("#recent-reports-list"),
   dateSwitcher: document.querySelector("#date-switcher"),
   prevDateBtn: document.querySelector("#prev-date-btn"),
   nextDateBtn: document.querySelector("#next-date-btn"),
@@ -85,6 +93,36 @@ function formatDate(date) {
   return `${year}.${month}.${day}`;
 }
 
+function goHome() {
+  if (window.location.hash) {
+    history.pushState("", "", window.location.pathname + window.location.search);
+  }
+  showHomeView();
+}
+
+function formatHomeDate(date) {
+  const [, month, day] = date.split("-");
+  return `${Number(month)}月${Number(day)}日`;
+}
+
+function extractOverview(markdownText) {
+  const match = markdownText.match(/##\s*今日概览\s*\n+([\s\S]*?)(?=\n##\s|$)/);
+  if (!match) {
+    return "本期概览暂不可用，点击查看日报正文。";
+  }
+
+  const overview = match[1]
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .find((line) => line && !line.startsWith(">"));
+
+  if (!overview) {
+    return "本期概览暂不可用，点击查看日报正文。";
+  }
+
+  return overview.replace(/[#*`_>]/g, "").trim();
+}
+
 function escapeHtml(text) {
   return text
     .replaceAll("&", "&amp;")
@@ -104,6 +142,18 @@ function showLoading(isLoading) {
 function showMessage(className, message) {
   elements.reportContent.innerHTML = `<div class="${className}">${escapeHtml(message)}</div>`;
   elements.reportContent.classList.add("ready");
+}
+
+function showHomeView() {
+  closeDateSwitcher();
+  if (elements.homeView) elements.homeView.hidden = false;
+  if (elements.readerView) elements.readerView.hidden = true;
+  document.title = "绿群日报";
+}
+
+function showReaderView() {
+  if (elements.homeView) elements.homeView.hidden = true;
+  if (elements.readerView) elements.readerView.hidden = false;
 }
 
 function renderMarkdown(markdownText) {
@@ -213,6 +263,69 @@ function renderDateSwitcher() {
     .join("");
 }
 
+function renderHomeView() {
+  if (!elements.latestReportDate || !elements.homeReportCount || !elements.recentReportsList) {
+    return;
+  }
+
+  elements.homeReportCount.textContent = `${state.manifest.length} 篇`;
+
+  if (!state.manifest.length) {
+    elements.latestReportDate.textContent = "暂无日报";
+    elements.recentReportsList.innerHTML = '<div class="date-switcher-empty">暂无可展示的日报。</div>';
+    return;
+  }
+
+  const [latestReport] = state.manifest;
+  elements.latestReportDate.textContent = formatHomeDate(latestReport.date);
+  elements.recentReportsList.innerHTML = state.manifest
+    .slice(0, 7)
+    .map((item, index) => {
+      const label = index === 0 ? '<span class="recent-report-label">最新</span>' : "";
+      return `
+        <a class="recent-report-item" href="#${item.date}" data-date="${item.date}">
+          <span class="recent-report-meta">
+            <span class="recent-report-date">${formatHomeDate(item.date)}</span>
+            ${label}
+          </span>
+          <span class="recent-report-summary">正在读取概览...</span>
+        </a>
+      `;
+    })
+    .join("");
+  loadRecentReportSummaries();
+}
+
+async function loadRecentReportSummaries() {
+  if (!elements.recentReportsList || !state.manifest.length) {
+    return;
+  }
+
+  const recentItems = state.manifest.slice(0, 7);
+  await Promise.all(recentItems.map(async (item) => {
+    const link = elements.recentReportsList.querySelector(`[data-date="${item.date}"]`);
+    const summary = link?.querySelector(".recent-report-summary");
+    if (!summary) {
+      return;
+    }
+
+    try {
+      if (!item.md_path) {
+        throw new Error("Missing report path");
+      }
+      const response = await fetch(`./data/${item.md_path}`, { cache: "force-cache" });
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+      const markdown = await response.text();
+      summary.textContent = extractOverview(markdown);
+    } catch (error) {
+      console.error(error);
+      summary.textContent = "概览加载失败，点击查看日报正文。";
+    }
+  }));
+}
+
 function updateHeader(item) {
   elements.activeDateLabel.textContent = "内容覆盖 05:00 至次日 05:00，每天 06:30 自动更新";
   elements.reportCount.textContent = `${state.manifest.length} 篇日报`;
@@ -222,11 +335,13 @@ function updateHeader(item) {
 async function loadReport(date) {
   const item = state.manifest.find((entry) => entry.date === date) ?? state.manifest[0];
   if (!item) {
+    showReaderView();
     showLoading(false);
     showMessage("empty-state", "暂无可展示的日报。");
     return;
   }
 
+  showReaderView();
   state.activeDate = item.date;
   updateHeader(item);
   renderDateSwitcher();
@@ -274,19 +389,27 @@ async function loadManifest() {
 
     state.manifest = await response.json();
     if (!Array.isArray(state.manifest) || !state.manifest.length) {
+      state.manifest = [];
+      renderHomeView();
       elements.reportCount.textContent = "0 篇日报";
       showLoading(false);
       renderDateSwitcher();
       showMessage("empty-state", "还没有可展示的日报，等下一次生成后这里会自动更新。");
+      showHomeView();
       return;
     }
 
+    renderHomeView();
     elements.reportCount.textContent = `${state.manifest.length} 篇日报`;
-    const targetDate = state.manifest.some((item) => item.date === getHashDate())
-      ? getHashDate()
-      : state.manifest[0].date;
-    if (getHashDate() !== targetDate) {
-      setHashDate(targetDate);
+    const targetDate = getHashDate();
+    if (!targetDate) {
+      showLoading(false);
+      renderDateSwitcher();
+      showHomeView();
+      return;
+    }
+    if (!state.manifest.some((item) => item.date === targetDate)) {
+      setHashDate(state.manifest[0].date);
       return;
     }
     await loadReport(targetDate);
@@ -301,6 +424,10 @@ async function loadManifest() {
 
 window.addEventListener("hashchange", () => {
   if (!state.manifest.length) {
+    return;
+  }
+  if (!getHashDate()) {
+    showHomeView();
     return;
   }
   const isKnownDate = state.manifest.some((item) => item.date === getHashDate());
@@ -340,6 +467,22 @@ function initDateSwitcher() {
       closeDateSwitcher();
     }
   });
+}
+
+function initHome() {
+  elements.homeLink?.addEventListener("click", (event) => {
+    event.preventDefault();
+    goHome();
+  });
+
+  elements.readLatestBtn?.addEventListener("click", () => {
+    const latestReport = state.manifest[0];
+    if (latestReport) {
+      setHashDate(latestReport.date);
+    }
+  });
+
+  elements.homeSearchBtn?.addEventListener("click", openSearch);
 }
 
 // --- Search Functionality ---
@@ -474,4 +617,5 @@ function initSearch() {
 initTheme();
 initDateSwitcher();
 initSearch();
+initHome();
 loadManifest();
