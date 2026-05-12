@@ -19,3 +19,8 @@ PAGES_DIR = Path(os.getenv("CSBAOYAN_PAGES_DIR", "pages"))
 OPENAI_BASE_URL = os.getenv("OPENAI_BASE_URL")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 OPENAI_MODEL = os.getenv("OPENAI_MODEL")
+
+# Telegram broadcast config
+TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN")
+TELEGRAM_CHANNEL_ID = os.getenv("TELEGRAM_CHANNEL_ID")
+SITE_BASE_URL = os.getenv("SITE_BASE_URL")

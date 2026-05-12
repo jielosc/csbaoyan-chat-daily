@@ -10,6 +10,8 @@ assert.match(indexHtml, /id="reader-view"/, "index.html should wrap the report r
 assert.match(indexHtml, /id="read-latest-btn"/, "homepage should expose a read-latest action");
 assert.match(indexHtml, /id="recent-reports-list"/, "homepage should expose a recent reports list");
 assert.match(indexHtml, /id="home-link"/, "header brand area should expose a home link");
+assert.match(indexHtml, /href="https:\/\/t\.me\/csbaoyan"/, "header status area should link to the Telegram channel");
+assert.match(indexHtml, /class="status-chip" aria-label="Telegram Channel"/, "header status area should expose a Telegram status chip");
 assert.match(indexHtml, /class="home-actions"\s+role="group"\s+aria-label="快捷入口"/, "quick actions should expose a named group");
 assert.match(indexHtml, /class="contribute-section"/, "homepage should include a contribution section");
 assert.match(indexHtml, /<nav class="contribute-actions" aria-label="反馈与项目链接">/, "contribution actions should be a named navigation landmark");

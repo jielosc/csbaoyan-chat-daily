@@ -2,6 +2,7 @@ param(
     [string]$RepoRoot = (Split-Path -Parent $PSScriptRoot),
     [string]$PythonCommand,
     [string]$LogDir,
+    [string]$ReportDate,
     [switch]$SkipGenerate,
     [switch]$SkipReleaseCheck,
     [switch]$SkipPush
@@ -13,6 +14,19 @@ $ErrorActionPreference = "Stop"
 function Write-Step {
     param([string]$Message)
     Write-Host "==> $Message"
+}
+
+function Resolve-ReportDate {
+    if (-not $ReportDate) {
+        return (Get-Date).Date.AddDays(-1).ToString("yyyy-MM-dd")
+    }
+
+    try {
+        return [DateTime]::ParseExact($ReportDate, "yyyy-MM-dd", [System.Globalization.CultureInfo]::InvariantCulture).ToString("yyyy-MM-dd")
+    }
+    catch {
+        throw "ReportDate must use YYYY-MM-DD format."
+    }
 }
 
 function Invoke-Git {
@@ -221,16 +235,33 @@ function Assert-UpstreamSynced {
     }
 }
 
+function Invoke-TelegramBroadcast {
+    param(
+        [hashtable]$PythonSpec,
+        [string]$resolvedReportDate
+    )
+
+    try {
+        Write-Step "Sending Telegram broadcast"
+        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("telegram_broadcast.py", "--date", $resolvedReportDate)
+    }
+    catch {
+        Write-Warning "Telegram broadcast failed but the daily pipeline will continue: $($_.Exception.Message)"
+    }
+}
+
 function Invoke-Main {
     param(
         [string]$ResolvedRepoRoot,
-        [hashtable]$PythonSpec
+        [hashtable]$PythonSpec,
+        [string]$resolvedReportDate
     )
 
     Set-Location $ResolvedRepoRoot
 
     Write-Step "Repository: $ResolvedRepoRoot"
     Write-Step "Python: $($PythonSpec.Command)"
+    Write-Step "Report date: $resolvedReportDate"
 
     $branch = $null
     if (-not $SkipPush) {
@@ -244,7 +275,7 @@ function Invoke-Main {
     # Treat it as a long-running step; brief periods without new log output are expected.
     if (-not $SkipGenerate) {
         Write-Step "Running generate_daily_report.py"
-        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("generate_daily_report.py")
+        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("generate_daily_report.py", "--date", $resolvedReportDate)
     }
 
     if (-not $SkipReleaseCheck) {
@@ -258,6 +289,12 @@ function Invoke-Main {
     $pendingPagesChanges = (& git status --porcelain -- pages/data)
     if (-not $pendingPagesChanges) {
         Write-Step "No changes detected in pages/data. Nothing to commit."
+        if ($SkipPush) {
+            Write-Step "Skipping Telegram broadcast because git push was skipped."
+            return 0
+        }
+        Invoke-TelegramBroadcast -PythonSpec $PythonSpec -resolvedReportDate $resolvedReportDate
+        Write-Step "Daily pipeline completed."
         return 0
     }
 
@@ -266,6 +303,7 @@ function Invoke-Main {
 
     if ($SkipPush) {
         Write-Step "Skipping git push as requested."
+        Write-Step "Skipping Telegram broadcast because git push was skipped."
         return 0
     }
 
@@ -286,12 +324,14 @@ function Invoke-Main {
         Invoke-Git -Arguments @("push", "-u", "origin", $branch) -ErrorMessage "git push failed."
     }
 
+    Invoke-TelegramBroadcast -PythonSpec $PythonSpec -resolvedReportDate $resolvedReportDate
     Write-Step "Daily pipeline completed."
     return 0
 }
 
 $resolvedRepoRoot = (Resolve-Path $RepoRoot).Path
 $pythonSpec = Resolve-PythonSpec
+$resolvedReportDate = Resolve-ReportDate
 $resolvedLogDir = if ($LogDir) {
     $LogDir
 }
@@ -309,7 +349,7 @@ try {
     Start-Transcript -Path $logPath -Append | Out-Null
     $transcriptStarted = $true
     Write-Step "Log file: $logPath"
-    $exitCode = Invoke-Main -ResolvedRepoRoot $resolvedRepoRoot -PythonSpec $pythonSpec
+    $exitCode = Invoke-Main -ResolvedRepoRoot $resolvedRepoRoot -PythonSpec $pythonSpec -ResolvedReportDate $resolvedReportDate
 }
 catch {
     Write-Error $_
