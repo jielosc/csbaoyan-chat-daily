@@ -8,6 +8,12 @@ CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）�
 
 - https://csbaoyan.icelon.top
 
+## 订阅方式 📢
+
+除了通过 GitHub Pages 查看，你还可以订阅 Telegram 频道获取每日更新推送：
+
+- **Telegram Channel**: <a href="https://t.me/csbaoyan" target="_blank" rel="noopener noreferrer">绿群日报</a>
+
 ## 免责声明
 
 绿群日报，本质上是借助 AI 工具对群内消息进行总结，内容可能存在不完全准确的情况，阅读时注意甄别。涉及夏令营/预推免等相关信息，请以官方平台发布的内容为准。
