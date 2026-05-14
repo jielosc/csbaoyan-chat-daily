@@ -330,7 +330,9 @@ async function loadRecentReportSummaries() {
 }
 
 function updateHeader(item) {
-  elements.activeDateLabel.textContent = "内容覆盖 05:00 至次日 05:00，每天 06:30 自动更新";
+  if (elements.activeDateLabel) {
+    elements.activeDateLabel.textContent = "";
+  }
   elements.reportCount.textContent = `${state.manifest.length} 篇日报`;
   document.title = `${item.date} | 绿群日报`;
 }
