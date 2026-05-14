@@ -1,77 +1,91 @@
-# 绿群日报（CS Baoyan Chat Daily） 📰
+# 绿群日报 / CS Baoyan Chat Daily
 
-CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）每日 AI 信息总结（非官方）
+>  CS 保研群 AI 日报整理项目，面向公开浏览与归档。
 
-在线查看 Pages：
 
-- https://csbaoyan.icelon.top
+## Quick Links
 
-## Changelog
+- 在线阅读: https://csbaoyan.icelon.top
+- Telegram Channel: https://t.me/csbaoyan
+- Changelog: [CHANGELOG.md](./CHANGELOG.md)
+- Workflow: [docs/workflow.md](./docs/workflow.md)
 
-### 2026-05-14
+## Why This Project / 为什么做这个项目
 
-- 日报内容覆盖时间范围已从 `05:00 ~ 次日05:00` 调整为 `00:00 ~ 24:00`
-- 运行逻辑已移除对“夕颜”账号的特殊映射，并取消日报生成中针对该 bot 的定制提示词
+- 保研相关信息常常淹没在高频聊天里，检索和回看都不方便。
+- 群人数有限，不是所有人都能长期留在群里跟进消息。
+- 把群聊中的有效信息沉淀成日报，可以降低获取门槛，也方便后续归档。
 
-## 订阅方式 📢
+## What It Does / 项目做什么
 
-除了通过 GitHub Pages 查看，你还可以订阅 Telegram 频道获取每日更新推送：
+- 读取按日期导出的群聊 JSON。
+- 对消息做清洗、匿名化和分块处理。
+- 用 OpenAI-compatible 模型提取重点并生成结构化日报。
+- 将最终日报发布到 `pages/data/reports/`，供 GitHub Pages 使用。
 
-- **Telegram Channel**: <a href="https://t.me/csbaoyan" target="_blank" rel="noopener noreferrer">绿群日报</a>
+## Quick Start / 快速开始
 
-## 免责声明
+### 1. 安装依赖 / Install
 
-绿群日报，本质上是借助 AI 工具对群内消息进行总结，内容可能存在不完全准确的情况，阅读时注意甄别。涉及夏令营/预推免等相关信息，请以官方平台发布的内容为准。
+```bash
+pip install -r requirements.txt
+```
 
-项目会尽量对聊天内容做匿名化处理，以降低身份暴露风险；但在少数语境下，仍不能完全排除基于上下文进行识别的可能。
+### 2. 配置环境变量 / Configure
 
-如果你认为仓库中的内容可能涉及身份暴露、隐私泄露或其他不适合公开的信息，请及时联系我，我会尽快核实并处理。
+最少需要配置模型相关变量：
 
-## 为什么做绿群日报？
+- `OPENAI_API_KEY`
+- `OPENAI_MODEL`
+- `OPENAI_BASE_URL`（如果你使用兼容 OpenAI 的第三方接口）
 
-- 对保研有帮助的信息常常混在大量无关的聊天消息里
-- 绿群有一定人数上限，会定期清理长期不发言的人，不是所有人都能一直留在群里
-- 群消息量巨大，普通人很难长期、高频地完整跟进
+可选变量：
 
-所以做日报的目的很直接：把群聊里那些对保研有帮助的信息尽量沉淀下来，降低绿群外同学获取信息的门槛，同时让没有时间阅读海量群消息的人方便获取群内精华信息
+- `CSBAOYAN_EXPORT_DIR`
+- `CSBAOYAN_PAGES_DIR`
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_CHANNEL_ID`
+- `SITE_BASE_URL`
 
-## Workflow 🔄
+### 3. 生成单日日报 / Generate One Report
 
-1. 读取已经导出的绿群聊天 JSON
-2. 对聊天内容做清洗和匿名化处理，尽量保留信息、去掉不必要的身份暴露
-3. 按主题和上下文分块提取有帮助内容，过滤灌水与重复信息
-4. 用 AI 将分块结果进一步整理，生成结构化日报
-5. 把最终日报同步到静态页面目录，方便归档和公开浏览
+```bash
+python generate_daily_report.py --date YYYY-MM-DD
+```
 
-运行过程中，产物大概分两类：
+### 4. 跑完整日常流水线 / Run Daily Pipeline
 
-- `internal/`：本地生成的中间产物，比如脱敏后的聊天记录、提取草稿等，默认不放入 GitHub 仓库
-- `pages/data/reports/`：最终公开的日报内容，便于归档和浏览
+```powershell
+powershell -File scripts/daily_pipeline.ps1 -ReportDate YYYY-MM-DD
+```
+
+这条流水线会串起日报生成、发布前检查、`pages/data` 提交以及 Telegram 播报。
+
+## Project Structure / 项目结构
+
+- `generate_daily_report.py`: 日报生成入口，负责读取聊天导出、调用模型并写出结果。
+- `scripts/daily_pipeline.ps1`: 日常运行脚本，串起生成、检查、提交与推送。
+- `telegram_broadcast.py`: 从日报中提取概览并发送到 Telegram 频道。
+- `pages/`: 静态站点资源与公开数据目录。
+- `pages/data/reports/`: 最终公开的日报 Markdown 文件。
+- `tests/`: 针对流水线脚本、站点页面和广播逻辑的测试。
+
+## 隐私与免责声明
+
+本项目本质上是借助 AI 对群聊内容进行摘要，内容可能存在遗漏或不完全准确的情况。涉及夏令营、预推免或其他正式招生信息时，请以官方通知为准。
+
+项目会尽量对聊天内容做匿名化处理，降低身份暴露风险；但在少数语境下，仍不能完全排除基于上下文进行识别的可能。
+
+如果你认为仓库中的公开内容可能涉及隐私泄露、身份暴露或其他不适合公开的信息，请及时联系我处理。
+
+## Contributing
+
+欢迎提 Issue、分享想法或直接发 PR，一起把这份日报做得更清晰、更有用。
+
+如果这个项目对你有帮助，也欢迎点一个 Star 支持一下。
 
 ## Acknowledgments
 
-绿群日报中的“绿群”，来源于 CS-BAOYAN 社区：
-
-- https://github.com/CS-BAOYAN
-
-聊天记录导出使用了开源工具：
-
-- https://github.com/shuakami/qq-chat-exporter
-
-感谢在绿群中提供保研相关内容的贡献者，感谢相关开源项目和社区一直以来提供的工具和维护工作。
-
-## Contributing 💡
-
-欢迎提 issue、分享想法、提改进建议，也欢迎直接发 PR，一起把这份日报做得更有用。
-
-项目制作不易，且在运行过程中会消耗大量 tokens。如果你觉得它对你有帮助，也欢迎点一个 Star 支持一下。
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jielosc%2Fcsbaoyan-chat-daily&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jielosc/csbaoyan-chat-daily&type=date&theme=dark&legend=bottom-right" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jielosc/csbaoyan-chat-daily&type=date&legend=bottom-right" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jielosc/csbaoyan-chat-daily&type=date&legend=bottom-right" />
- </picture>
-</a>
+- “绿群”来自 [CS-BAOYAN](https://github.com/CS-BAOYAN) 社区。
+- 聊天记录导出使用了 [qq-chat-exporter](https://github.com/shuakami/qq-chat-exporter)。
+- 感谢绿群中持续提供信息的同学，以及相关开源工具和社区维护者。
