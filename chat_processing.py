@@ -27,13 +27,7 @@ URL_PATTERN = re.compile(
 )
 PHONE_PATTERN = re.compile(r"(?<!\d)(?:\+?86[- ]?)?1[3-9]\d{9}(?!\d)")
 CONTACT_ID_PATTERN = re.compile(r"(?i)\b(?:qq|vx|wechat|weixin|微信)[:： ]*[A-Za-z0-9_-]{5,}\b")
-PUBLIC_ALIAS_RULES = (
-    {
-        "alias": "夕颜",
-        "uid": "u_I7GbXJlBNyKvJIKuoZ4dXw",
-        "uin": "3352037245",
-    },
-)
+PUBLIC_ALIAS_RULES = ()
 
 
 def should_register_suffix_alias(suffix: str) -> bool:
