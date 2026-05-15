@@ -65,13 +65,3 @@ CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）�
 欢迎提 issue、分享想法、提改进建议，也欢迎直接发 PR，一起把这份日报做得更有用。
 
 项目制作不易，且在运行过程中会消耗大量 tokens。如果你觉得它对你有帮助，也欢迎点一个 Star 支持一下。
-
-## Star History
-
-<a href="https://www.star-history.com/?repos=jielosc%2Fcsbaoyan-chat-daily&type=date&legend=top-left">
- <picture>
-   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/chart?repos=jielosc/csbaoyan-chat-daily&type=date&theme=dark&legend=bottom-right" />
-   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/chart?repos=jielosc/csbaoyan-chat-daily&type=date&legend=bottom-right" />
-   <img alt="Star History Chart" src="https://api.star-history.com/chart?repos=jielosc/csbaoyan-chat-daily&type=date&legend=bottom-right" />
- </picture>
-</a>
