@@ -2,10 +2,8 @@ param(
     [string]$RepoRoot = (Split-Path -Parent $PSScriptRoot),
     [string]$PythonCommand,
     [string]$LogDir,
-    [string]$ReportDate,
-    [switch]$SkipGenerate,
-    [switch]$SkipReleaseCheck,
-    [switch]$SkipPush
+    [Parameter(ValueFromRemainingArguments = $true)]
+    [string[]]$PipelineArgs
 )
 
 Set-StrictMode -Version Latest
@@ -14,31 +12,6 @@ $ErrorActionPreference = "Stop"
 function Write-Step {
     param([string]$Message)
     Write-Host "==> $Message"
-}
-
-function Resolve-ReportDate {
-    if (-not $ReportDate) {
-        return (Get-Date).Date.AddDays(-1).ToString("yyyy-MM-dd")
-    }
-
-    try {
-        return [DateTime]::ParseExact($ReportDate, "yyyy-MM-dd", [System.Globalization.CultureInfo]::InvariantCulture).ToString("yyyy-MM-dd")
-    }
-    catch {
-        throw "ReportDate must use YYYY-MM-DD format."
-    }
-}
-
-function Invoke-Git {
-    param(
-        [string[]]$Arguments,
-        [string]$ErrorMessage
-    )
-
-    & git @Arguments
-    if ($LASTEXITCODE -ne 0) {
-        throw $ErrorMessage
-    }
 }
 
 function Resolve-PythonSpec {
@@ -138,200 +111,42 @@ function Invoke-RepoPython {
     }
 }
 
-function Assert-GitOrigin {
-    $null = & git remote get-url origin 2>$null
-    if ($LASTEXITCODE -ne 0) {
-        throw "Git remote origin is not configured. Run: git remote add origin <your-github-repo-url>"
-    }
-}
-
-function Get-CurrentBranch {
-    $branch = (& git branch --show-current).Trim()
-    if (-not $branch) {
-        throw "Could not detect the current branch. Check out a local branch first."
-    }
-    return $branch
-}
-
-function Get-UpstreamStatus {
-    param([string]$Branch)
-
-    $null = & git rev-parse --abbrev-ref --symbolic-full-name "@{u}" 2>$null
-    $hasUpstream = ($LASTEXITCODE -eq 0)
-    if (-not $hasUpstream) {
-        return [pscustomobject]@{
-            HasUpstream = $false
-            Ahead = 0
-            Behind = 0
-        }
-    }
-
-    $null = Invoke-Git -Arguments @("fetch", "origin", $Branch) -ErrorMessage "git fetch failed."
-    $counts = (& git rev-list --left-right --count "HEAD...origin/$Branch").Trim()
-    if (-not $counts) {
-        throw "Could not determine branch divergence against origin/$Branch."
-    }
-
-    $parts = $counts -split "\s+"
-    if ($parts.Length -lt 2) {
-        throw "Unexpected git rev-list output: $counts"
-    }
-
-    return [pscustomobject]@{
-        HasUpstream = $true
-        Ahead = [int]$parts[0]
-        Behind = [int]$parts[1]
-    }
-}
-
-function Test-WorkingTreeClean {
-    $pendingChanges = (& git status --porcelain)
-    return (-not $pendingChanges)
-}
-
-function Sync-UpstreamIfBehind {
-    param(
-        [string]$Branch,
-        [string]$Phase
-    )
-
-    $status = Get-UpstreamStatus -Branch $Branch
-    if (-not $status.HasUpstream) {
-        return $status
-    }
-
-    if ($status.Behind -le 0) {
-        return $status
-    }
-
-    if ($status.Ahead -gt 0) {
-        throw "Local branch diverged from origin/$Branch during $Phase (ahead=$($status.Ahead), behind=$($status.Behind)). Resolve it manually before running the daily pipeline."
-    }
-
-    if (-not (Test-WorkingTreeClean)) {
-        throw "Local branch is behind origin/$Branch during $Phase, but the working tree is not clean. Commit or stash local changes, then rerun the daily pipeline."
-    }
-
-    Write-Step "Local branch is behind origin/$Branch by $($status.Behind) commit(s); fast-forwarding before $Phase"
-    $null = Invoke-Git -Arguments @("pull", "--ff-only", "origin", $Branch) -ErrorMessage "git pull --ff-only failed."
-    return Get-UpstreamStatus -Branch $Branch
-}
-
-function Assert-UpstreamSynced {
-    param(
-        [string]$Branch,
-        [string]$Phase,
-        [switch]$AllowAhead
-    )
-
-    $status = Sync-UpstreamIfBehind -Branch $Branch -Phase $Phase
-    if (-not $status.HasUpstream) {
-        return
-    }
-
-    $hasBlockingAhead = (-not $AllowAhead) -and ($status.Ahead -gt 0)
-    if ($hasBlockingAhead -or $status.Behind -gt 0) {
-        throw "Local branch is not in sync with origin/$Branch during $Phase (ahead=$($status.Ahead), behind=$($status.Behind)). Resolve it manually before running the daily pipeline."
-    }
-}
-
-function Invoke-TelegramBroadcast {
-    param(
-        [hashtable]$PythonSpec,
-        [string]$resolvedReportDate
-    )
-
-    try {
-        Write-Step "Sending Telegram broadcast"
-        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("telegram_broadcast.py", "--date", $resolvedReportDate)
-    }
-    catch {
-        Write-Warning "Telegram broadcast failed but the daily pipeline will continue: $($_.Exception.Message)"
-    }
-}
-
 function Invoke-Main {
     param(
         [string]$ResolvedRepoRoot,
         [hashtable]$PythonSpec,
-        [string]$resolvedReportDate
+        [string[]]$ForwardedArgs
     )
 
     Set-Location $ResolvedRepoRoot
 
     Write-Step "Repository: $ResolvedRepoRoot"
     Write-Step "Python: $($PythonSpec.Command)"
-    Write-Step "Report date: $resolvedReportDate"
-
-    $branch = $null
-    if (-not $SkipPush) {
-        Write-Step "Checking Git remote and upstream before generation"
-        Assert-GitOrigin
-        $branch = Get-CurrentBranch
-        Assert-UpstreamSynced -Branch $branch -Phase "preflight"
-    }
-
-    # generate_daily_report.py performs multiple LLM/API calls and usually takes about 3-5 minutes.
-    # Treat it as a long-running step; brief periods without new log output are expected.
-    if (-not $SkipGenerate) {
-        Write-Step "Running generate_daily_report.py"
-        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("generate_daily_report.py", "--date", $resolvedReportDate)
-    }
-
-    if (-not $SkipReleaseCheck) {
-        Write-Step "Running release_check.py"
-        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("release_check.py")
-    }
-
-    Write-Step "Staging pages/data"
-    Invoke-Git -Arguments @("add", "--all", "--", "pages/data") -ErrorMessage "git add pages/data failed."
-
-    $pendingPagesChanges = (& git status --porcelain -- pages/data)
-    if (-not $pendingPagesChanges) {
-        Write-Step "No changes detected in pages/data. Nothing to commit."
-        if ($SkipPush) {
-            Write-Step "Skipping Telegram broadcast because git push was skipped."
-            return 0
-        }
-        Invoke-TelegramBroadcast -PythonSpec $PythonSpec -resolvedReportDate $resolvedReportDate
-        Write-Step "Daily pipeline completed."
-        return 0
-    }
-
-    Write-Step "Committing pages/data updates"
-    Invoke-Git -Arguments @("commit", "-m", "chore: update pages data", "--", "pages/data") -ErrorMessage "git commit failed."
-
-    if ($SkipPush) {
-        Write-Step "Skipping git push as requested."
-        Write-Step "Skipping Telegram broadcast because git push was skipped."
-        return 0
-    }
-
-    Write-Step "Checking Git remote and upstream before push"
-    Assert-GitOrigin
-    if (-not $branch) {
-        $branch = Get-CurrentBranch
-    }
-    Assert-UpstreamSynced -Branch $branch -Phase "pre-push" -AllowAhead
-
-    $status = Get-UpstreamStatus -Branch $branch
-    if ($status.HasUpstream) {
-        Write-Step "Pushing to the configured upstream branch"
-        Invoke-Git -Arguments @("push") -ErrorMessage "git push failed."
+    Write-Step "Delegating to Python CLI"
+    $previousPythonPath = $env:PYTHONPATH
+    $pythonPathPrefix = Join-Path $ResolvedRepoRoot "src"
+    $env:PYTHONPATH = if ([string]::IsNullOrWhiteSpace($previousPythonPath)) {
+        $pythonPathPrefix
     }
     else {
-        Write-Step "Pushing to origin/$branch for the first time"
-        Invoke-Git -Arguments @("push", "-u", "origin", $branch) -ErrorMessage "git push failed."
+        "$pythonPathPrefix$([IO.Path]::PathSeparator)$previousPythonPath"
     }
-
-    Invoke-TelegramBroadcast -PythonSpec $PythonSpec -resolvedReportDate $resolvedReportDate
-    Write-Step "Daily pipeline completed."
+    try {
+        Invoke-RepoPython -PythonSpec $PythonSpec -Arguments @("-m", "csbaoyan_daily.cli", "pipeline", "--repo-root", $ResolvedRepoRoot) + $ForwardedArgs
+    }
+    finally {
+        if ([string]::IsNullOrWhiteSpace($previousPythonPath)) {
+            Remove-Item Env:PYTHONPATH -ErrorAction SilentlyContinue
+        }
+        else {
+            $env:PYTHONPATH = $previousPythonPath
+        }
+    }
     return 0
 }
 
 $resolvedRepoRoot = (Resolve-Path $RepoRoot).Path
 $pythonSpec = Resolve-PythonSpec
-$resolvedReportDate = Resolve-ReportDate
 $resolvedLogDir = if ($LogDir) {
     $LogDir
 }
@@ -349,7 +164,7 @@ try {
     Start-Transcript -Path $logPath -Append | Out-Null
     $transcriptStarted = $true
     Write-Step "Log file: $logPath"
-    $exitCode = Invoke-Main -ResolvedRepoRoot $resolvedRepoRoot -PythonSpec $pythonSpec -ResolvedReportDate $resolvedReportDate
+    $exitCode = Invoke-Main -ResolvedRepoRoot $resolvedRepoRoot -PythonSpec $pythonSpec -ForwardedArgs $PipelineArgs
 }
 catch {
     Write-Error $_

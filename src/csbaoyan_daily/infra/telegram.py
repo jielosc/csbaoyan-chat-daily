@@ -1,38 +1,13 @@
 from __future__ import annotations
 
-import argparse
-import datetime as dt
 import html
 import json
-import logging
 import re
-import sys
 import urllib.error
 import urllib.request
 from pathlib import Path
 
-from app_config import PAGES_DIR, SITE_BASE_URL, TELEGRAM_BOT_TOKEN, TELEGRAM_CHANNEL_ID
-from file_utils import validate_report_date
-
-
 OVERVIEW_SECTION_PATTERN = re.compile(r"##\s*今日概览\s*\n+([\s\S]*?)(?=\n##\s|$)")
-
-
-def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Broadcast the daily report overview to a Telegram channel.")
-    parser.add_argument(
-        "--date",
-        type=validate_report_date,
-        default=(dt.date.today() - dt.timedelta(days=1)).strftime("%Y-%m-%d"),
-        help="Report date in YYYY-MM-DD format.",
-    )
-    parser.add_argument(
-        "--pages-dir",
-        type=Path,
-        default=PAGES_DIR,
-        help="Pages directory that contains data/reports.",
-    )
-    return parser.parse_args()
 
 
 def extract_overview(markdown_text: str) -> str:
@@ -107,52 +82,3 @@ def send_telegram_message(bot_token: str, channel_id: str, message: str) -> None
 
     if not response_payload.get("ok"):
         raise RuntimeError(f"Telegram API returned an error: {response_payload}")
-
-
-def get_required_config() -> tuple[str, str, str] | None:
-    required = {
-        "TELEGRAM_BOT_TOKEN": TELEGRAM_BOT_TOKEN,
-        "TELEGRAM_CHANNEL_ID": TELEGRAM_CHANNEL_ID,
-        "SITE_BASE_URL": SITE_BASE_URL,
-    }
-    missing = [name for name, value in required.items() if not str(value or "").strip()]
-    if missing:
-        logging.warning("Skipping Telegram broadcast: missing required config: %s", ", ".join(missing))
-        return None
-
-    return (
-        str(TELEGRAM_BOT_TOKEN).strip(),
-        str(TELEGRAM_CHANNEL_ID).strip(),
-        str(SITE_BASE_URL).strip(),
-    )
-
-
-def main() -> int:
-    args = parse_args()
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s [%(levelname)s] %(message)s",
-        stream=sys.stdout,
-    )
-
-    config = get_required_config()
-    if config is None:
-        return 0
-
-    bot_token, channel_id, site_base_url = config
-
-    try:
-        report_path = resolve_report_path(args.pages_dir, args.date)
-        report_markdown = read_report(report_path)
-        overview = extract_overview(report_markdown)
-        message = compose_message(args.date, overview, site_base_url)
-        send_telegram_message(bot_token, channel_id, message)
-        logging.info("Telegram broadcast sent for %s", args.date)
-        return 0
-    except Exception as exc:
-        logging.error("Telegram broadcast failed: %s", exc)
-        return 1
-
-
-if __name__ == "__main__":
-    sys.exit(main())

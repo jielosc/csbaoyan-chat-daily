@@ -7,7 +7,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Any
 
-from chat_processing import ChatChunk
+from .chat_processing import ChatChunk
 
 
 EXTRACTION_SYSTEM_PROMPT = """你是一名熟悉“保研/夏令营/预推免/联系导师/实验室招生”语境的信息编辑。
@@ -58,22 +58,6 @@ def sanitize_report_text(text: str) -> str:
     sanitized = re.sub(r"(?<!需谨慎核实)避雷向", "需谨慎核实", sanitized)
     sanitized = re.sub(r"坑\s*导", "存在争议的导师", sanitized)
     return sanitized
-
-
-def create_openai_client(api_key: str | None, base_url: str | None, timeout: float):
-    if not api_key:
-        raise ValueError("缺少 OpenAI API Key。请设置 OPENAI_API_KEY 或通过 --api-key 传入。")
-
-    try:
-        from openai import OpenAI
-    except ImportError as exc:
-        raise ImportError("未安装 openai 库，请先执行 `pip install -r requirements.txt`。") from exc
-
-    client_kwargs: dict[str, Any] = {"api_key": api_key, "timeout": timeout}
-    if base_url:
-        client_kwargs["base_url"] = base_url
-    return OpenAI(**client_kwargs)
-
 
 def call_llm_with_retry(
     client: Any,
