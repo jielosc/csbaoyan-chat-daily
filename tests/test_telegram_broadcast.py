@@ -1,6 +1,11 @@
 import unittest
+import sys
+from pathlib import Path
 
-from telegram_broadcast import build_report_url, compose_message, extract_overview
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+from csbaoyan_daily.infra.telegram import build_report_url, compose_message, extract_overview
+
 
 
 class ExtractOverviewTests(unittest.TestCase):
