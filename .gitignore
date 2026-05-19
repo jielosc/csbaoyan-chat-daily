@@ -13,6 +13,7 @@ venv/
 
 chat_exports/
 internal/
+logs/
 *.log
 Thumbs.db
 .DS_Store
