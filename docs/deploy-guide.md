@@ -9,7 +9,7 @@
 - Python 3.10+
 - Git 2.x+
 - [qq-chat-exporter](https://github.com/shuakami/qq-chat-exporter) 导出聊天记录
-- OpenAI 兼容 API（默认 DeepSeek）
+- OpenAI 兼容 API
 
 ### 安装
 
@@ -109,50 +109,19 @@ python -m csbaoyan_daily.cli pipeline --skip-push
 
 ## 3. 定时任务
 
-### Linux / macOS (cron)
+**Linux / macOS** — 用 cron 即可：
 
 ```bash
 crontab -e
+# 添加一行（每天 06:30 运行）：
+# 30 6 * * * /path/to/scripts/daily_pipeline.sh >> /path/to/logs/cron.log 2>&1
 ```
 
-```cron
-30 6 * * * /path/to/csbaoyan-chat-daily/scripts/daily_pipeline.sh >> /path/to/logs/cron.log 2>&1
-```
-
-### Windows（计划任务）
+**Windows** — 项目自带注册脚本：
 
 ```powershell
-.\scripts\register_daily_task.ps1                              # 默认 06:30
-.\scripts\register_daily_task.ps1 -Time "07:00"               # 指定时间
-.\scripts\register_daily_task.ps1 -RunWhenSignedOut -Password "xxx"  # 未登录也运行
-```
-
-### Linux (systemd)
-
-```bash
-# /etc/systemd/system/csbaoyan-daily.service
-[Unit]
-Description=CS Baoyan Daily Pipeline
-
-[Service]
-Type=oneshot
-WorkingDirectory=/path/to/csbaoyan-chat-daily
-ExecStart=/path/to/csbaoyan-chat-daily/scripts/daily_pipeline.sh
-
-# /etc/systemd/system/csbaoyan-daily.timer
-[Unit]
-Description=CS Baoyan Daily Timer
-
-[Timer]
-OnCalendar=*-*-* 06:30:00
-Persistent=true
-
-[Install]
-WantedBy=timers.target
-```
-
-```bash
-sudo systemctl enable --now csbaoyan-daily.timer
+.\scripts\register_daily_task.ps1                               # 默认 06:30
+.\scripts\register_daily_task.ps1 -Time "07:00"                 # 指定时间
 ```
 
 ---

@@ -6,12 +6,16 @@ CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）�
 
 - https://csbaoyan.icelon.top
 
+## 自行部署
+
+Pages 目前已暂时停止更新，如果你想自行运行绿群日报，可以参考 [部署与使用指南](./docs/deploy-guide.md)，其中包含环境准备、配置、定时任务和前端部署的完整说明。
+
 ## Changelog
 
 ### 2026-05-20
 
 - 由于一些原因，给项目运行带来阻力，日报暂时停止更新（[查看详情](./docs/pause-update.md)）
-- 后续会完善项目以及使用文档，方便大家自行部署。
+- 完善项目使用文档，方便大家自行部署。
 
 ### 2026-05-19
 
