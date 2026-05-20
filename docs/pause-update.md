@@ -1,6 +1,6 @@
 # 暂停更新说明
 
-![强制下线截图](assets/IMG_3348.jpg)
+<img src="assets/IMG_3348.jpg" alt="强制下线截图" width="50%">
 
 如图所示，在使用聊天记录导出工具 [shuakami/qq-chat-exporter](https://github.com/shuakami/qq-chat-exporter) 时，遇到了强制下线的问题。
 
@@ -8,6 +8,6 @@
 
 我原期望让小号进群继续每天收集聊天记录，原始账号留在群里聊天使用。但小号申请进群后很久没有被同意，与群主沟通后得到不支持的回复。后面再次申请进群，被针对性踢出。
 
-![拒绝入群截图](assets/IMG_3346.jpg)
+<img src="assets/IMG_3346.jpg" alt="拒绝入群截图" width="50%">
 
 由于每日手动导出聊天记录带来一定的时间与精力成本，所以决定暂时日报停止运行。
