@@ -11,7 +11,7 @@
   <meta property="og:type" content="website" />
   <meta property="og:url" content="https://jielosc.github.io/csbaoyan-chat-daily/" />
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📰</text></svg>" />
-  <link rel="stylesheet" href="./styles.css?v=20260319i" />
+  <link rel="stylesheet" href="./styles.css?v=20260520b" />
   <script>
     const savedTheme = localStorage.getItem('theme') || 'system';
     if (savedTheme === 'dark' || (savedTheme === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -67,6 +67,16 @@
     <div>
       <main>
         <section class="home-view" id="home-view" hidden>
+          <section class="pause-banner" aria-labelledby="pause-banner-title">
+            <div class="pause-banner-copy">
+              <p class="reader-label">Notice</p>
+              <h2 id="pause-banner-title">日报已暂时停止更新</h2>
+              <p>历史内容仍可按日期浏览和搜索。</p>
+            </div>
+            <div class="pause-banner-meta">
+              <a class="secondary-action" href="https://github.com/jielosc/csbaoyan-chat-daily/blob/main/docs/pause-update.md" target="_blank" rel="noopener noreferrer">查看详情</a>
+            </div>
+          </section>
           <div class="home-hero">
             <div class="home-copy">
               <h2>把绿群中有用的保研信息，整理成每日可读的一页</h2>

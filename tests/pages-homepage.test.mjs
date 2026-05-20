@@ -10,6 +10,8 @@ assert.match(indexHtml, /id="reader-view"/, "index.html should wrap the report r
 assert.match(indexHtml, /id="read-latest-btn"/, "homepage should expose a read-latest action");
 assert.match(indexHtml, /id="recent-reports-list"/, "homepage should expose a recent reports list");
 assert.match(indexHtml, /id="home-link"/, "header brand area should expose a home link");
+assert.match(indexHtml, /class="pause-banner"/, "homepage should expose a pause-update banner");
+assert.match(indexHtml, /docs\/pause-update\.md/, "pause-update banner should link to the pause detail note");
 assert.match(indexHtml, /href="https:\/\/t\.me\/csbaoyan"/, "header status area should link to the Telegram channel");
 assert.match(indexHtml, /class="status-chip" aria-label="Telegram Channel"/, "header status area should expose a Telegram status chip");
 assert.match(indexHtml, /class="home-actions"\s+role="group"\s+aria-label="快捷入口"/, "quick actions should expose a named group");
@@ -27,6 +29,7 @@ assert.match(appJs, /const\s+targetDate\s*=\s*getHashDate\(\)/, "manifest loadin
 assert.match(appJs, /catch \(error\) \{\s*console\.error\(error\);\s*showReaderView\(\);/s, "manifest load failure should reveal the reader error state");
 
 assert.match(stylesCss, /\.home-view\b/, "styles.css should style the homepage view");
+assert.match(stylesCss, /\.pause-banner\b/, "styles.css should style the pause-update banner");
 assert.match(stylesCss, /\.recent-reports-list\b/, "styles.css should style the recent reports list");
 assert.match(stylesCss, /\.recent-report-summary\b/, "styles.css should style recent report overview text");
 assert.match(stylesCss, /\.contribute-section\b/, "styles.css should style the contribution section");
