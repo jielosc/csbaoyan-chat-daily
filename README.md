@@ -8,6 +8,11 @@ CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）�
 
 ## Changelog
 
+### 2026-05-20
+
+- 由于一些原因，给项目运行带来阻力，日报暂时停止更新（[查看详情](./docs/pause-update.md)）
+- 后续会完善项目以及使用文档，方便大家自行部署。
+
 ### 2026-05-19
 
 - 整理了项目结构，后续维护会更清楚一些
@@ -17,12 +22,6 @@ CS（Computer Science） 保研群（[绿群](https://github.com/CS-BAOYAN)）�
 
 - 日报内容覆盖时间范围已从 `05:00 ~ 次日05:00` 调整为 `00:00 ~ 24:00`
 - 运行逻辑已移除对“夕颜”账号的特殊映射，并取消日报生成中针对该 bot 的定制提示词
-
-## 订阅方式 📢
-
-除了通过 GitHub Pages 查看，你还可以订阅 Telegram 频道获取每日更新推送：
-
-- **Telegram Channel**: <a href="https://t.me/csbaoyan" target="_blank" rel="noopener noreferrer">绿群日报</a>
 
 ## 免责声明
 
