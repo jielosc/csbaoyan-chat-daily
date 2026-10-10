@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1600" height="500" viewBox="0 0 1600 500" fill="none" role="img" aria-labelledby="title desc">
+  <title id="title">从群聊到每日重点</title>
+  <desc id="desc">ChatLab JSON 经过匿名化、AI 提取与校验，整理成包含重点、讨论、待核实信息和轻松一刻的 Markdown 日报。</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1600" y2="500" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#101C34"/><stop offset="1" stop-color="#172E44"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="1120" y1="40" x2="1510" y2="480" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#6EE7D1" stop-opacity=".14"/><stop offset="1" stop-color="#60A5FA" stop-opacity=".02"/>
+    </linearGradient>
+  </defs>
+  <rect width="1600" height="500" rx="24" fill="url(#bg)"/>
+  <circle cx="1410" cy="180" r="310" fill="url(#accent)"/>
+  <path d="M0 438H1600M0 62H1600" stroke="#D5E9FF" stroke-opacity=".05"/>
+  <g font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif">
+    <rect x="76" y="75" width="8" height="18" rx="4" fill="#6EE7D1"/>
+    <text x="100" y="90" fill="#A9C5DB" font-size="17" font-weight="600" letter-spacing="3">LESS SCROLLING. MORE SIGNAL.</text>
+    <text x="76" y="181" fill="#F3F7FC" font-size="54" font-weight="700">让群聊里的信息，</text>
+    <text x="76" y="255" fill="#85E9D6" font-size="54" font-weight="700">成为每天的重点。</text>
+    <text x="79" y="309" fill="#B0C1D5" font-size="22">清晰的脉络 · 独立的待核实板块 · 可归档的 Markdown</text>
+    <g font-size="17" font-weight="500" text-anchor="middle">
+      <rect x="78" y="363" width="164" height="43" rx="21.5" fill="#FFFFFF" fill-opacity=".06" stroke="#FFFFFF" stroke-opacity=".12"/>
+      <text x="160" y="391" fill="#D8E6F3">ChatLab JSON</text>
+      <path d="M257 384H289M283 378L289 384L283 390" stroke="#7593AB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="304" y="363" width="164" height="43" rx="21.5" fill="#FFFFFF" fill-opacity=".06" stroke="#FFFFFF" stroke-opacity=".12"/>
+      <text x="386" y="391" fill="#D8E6F3">匿名化与提取</text>
+      <path d="M483 384H515M509 378L515 384L509 390" stroke="#7593AB" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+      <rect x="530" y="363" width="164" height="43" rx="21.5" fill="#6EE7D1" fill-opacity=".1" stroke="#6EE7D1" stroke-opacity=".3"/>
+      <text x="612" y="391" fill="#85E9D6">结构化日报</text>
+    </g>
+    <rect x="955" y="65" width="530" height="380" rx="18" fill="#080F1F" fill-opacity=".3"/>
+    <rect x="940" y="52" width="530" height="380" rx="18" fill="#F7FAFD"/>
+    <path d="M940 70C940 60.059 948.059 52 958 52H1452C1461.94 52 1470 60.059 1470 70V101H940V70Z" fill="#E8EEF5"/>
+    <circle cx="966" cy="77" r="5" fill="#A6B7C9"/><circle cx="984" cy="77" r="5" fill="#A6B7C9"/><circle cx="1002" cy="77" r="5" fill="#A6B7C9"/>
+    <text x="1205" y="83" fill="#536A80" font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="15" text-anchor="middle">daily-report.md</text>
+    <text x="975" y="144" fill="#71869A" font-size="12" font-weight="700" letter-spacing="2">CS BAOYAN / DAILY DIGEST</text>
+    <text x="975" y="181" fill="#172B43" font-size="27" font-weight="700">今日群聊日报</text>
+    <rect x="1342" y="155" width="94" height="28" rx="14" fill="#DEF4ED"/>
+    <text x="1389" y="174" fill="#227D69" font-size="12" font-weight="600" text-anchor="middle">Markdown</text>
+    <path d="M975 200H1436" stroke="#DEE6EF"/>
+    <g font-size="17" font-weight="600" fill="#263E57">
+      <text x="1017" y="238">今日值得关注</text><text x="1017" y="290">今日讨论脉络</text>
+      <text x="1017" y="342">传闻与待核实</text><text x="1017" y="394">轻松一刻</text>
+    </g>
+    <g font-family="ui-monospace, SFMono-Regular, Consolas, monospace" font-size="13" text-anchor="middle">
+      <rect x="975" y="217" width="28" height="28" rx="7" fill="#DFEAFB"/><text x="989" y="236" fill="#3869AB">01</text>
+      <rect x="975" y="269" width="28" height="28" rx="7" fill="#DEF3EE"/><text x="989" y="288" fill="#287F6B">02</text>
+      <rect x="975" y="321" width="28" height="28" rx="7" fill="#FBEDD6"/><text x="989" y="340" fill="#936A27">03</text>
+      <rect x="975" y="373" width="28" height="28" rx="7" fill="#EDE6FA"/><text x="989" y="392" fill="#7C5CA6">04</text>
+    </g>
+    <g stroke="#DEE6EF" stroke-width="5" stroke-linecap="round">
+      <path d="M1223 231H1433M1223 242H1375M1223 283H1433M1223 294H1395M1223 335H1433M1223 346H1360M1223 387H1433M1223 398H1385"/>
+    </g>
+  </g>
+</svg>
