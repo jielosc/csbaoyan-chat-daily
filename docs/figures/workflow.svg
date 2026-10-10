@@ -1,0 +1,165 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="2240" height="1040" viewBox="0 0 2240 1040" role="img" aria-labelledby="title desc">
+<title id="title">CS Baoyan Chat Daily：从群聊到证据约束的结构化日报</title>
+<desc id="desc">ChatLab JSON 经校验、脱敏和重叠分块后，由模型分块提取带证据编号的候选信息，再按四个板块分别编辑；合并校验后由程序渲染 Markdown。完整流水线默认执行发布检查，可选上传 R2、供 Pages 读取并发送 Telegram 概览。证据编号仅供内部校验。</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 Z" fill="#6b7885"/></marker></defs>
+<rect x="0" y="0" width="2240" height="1040" rx="0" fill="white" stroke="none" stroke-width="1.7"/>
+<text x="40" y="59" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="37" font-weight="600" fill="#192938" text-anchor="start">从群聊到结构化日报</text>
+<text x="40" y="99" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="23" font-weight="400" fill="#586777" text-anchor="start">CS Baoyan Chat Daily  /  Evidence-constrained report generation</text>
+<text x="2200" y="57" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="500" fill="#586777" text-anchor="end">SYSTEM WORKFLOW</text>
+<text x="2200" y="93" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="end">输入 → 隐私预处理 → 两阶段生成 → 输出与分发</text>
+<rect x="40" y="140" width="270" height="828" rx="14" fill="#f5f8fc" stroke="#dce2e8" stroke-width="1.7"/>
+<rect x="60" y="163" width="38" height="38" rx="8" fill="#436c9b" stroke="#436c9b" stroke-width="1.7"/>
+<text x="79" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="23" font-weight="600" fill="white" text-anchor="middle">a</text>
+<text x="112" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="27" font-weight="600" fill="#192938" text-anchor="start">数据接入</text>
+<text x="62" y="227" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#436c9b" text-anchor="start">DATA INGESTION</text>
+<rect x="335" y="140" width="390" height="828" rx="14" fill="#f3f9f8" stroke="#dce2e8" stroke-width="1.7"/>
+<rect x="355" y="163" width="38" height="38" rx="8" fill="#277e79" stroke="#277e79" stroke-width="1.7"/>
+<text x="374" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="23" font-weight="600" fill="white" text-anchor="middle">b</text>
+<text x="407" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="27" font-weight="600" fill="#192938" text-anchor="start">隐私预处理</text>
+<text x="357" y="227" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#277e79" text-anchor="start">PRIVACY &amp; CHUNKING</text>
+<rect x="750" y="140" width="1020" height="828" rx="14" fill="#f8f6fb" stroke="#dce2e8" stroke-width="1.7"/>
+<rect x="770" y="163" width="38" height="38" rx="8" fill="#76609d" stroke="#76609d" stroke-width="1.7"/>
+<text x="789" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="23" font-weight="600" fill="white" text-anchor="middle">c</text>
+<text x="822" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="27" font-weight="600" fill="#192938" text-anchor="start">证据约束的两阶段生成</text>
+<text x="772" y="227" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#76609d" text-anchor="start">CHUNK EXTRACTION → SECTION SYNTHESIS</text>
+<rect x="1795" y="140" width="405" height="828" rx="14" fill="#fcf9f2" stroke="#dce2e8" stroke-width="1.7"/>
+<rect x="1815" y="163" width="38" height="38" rx="8" fill="#9b7431" stroke="#9b7431" stroke-width="1.7"/>
+<text x="1834" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="23" font-weight="600" fill="white" text-anchor="middle">d</text>
+<text x="1867" y="190" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="27" font-weight="600" fill="#192938" text-anchor="start">输出与分发</text>
+<text x="1817" y="227" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#9b7431" text-anchor="start">RENDERING &amp; OPTIONAL DELIVERY</text>
+<rect x="65" y="280" width="220" height="290" rx="10" fill="white" stroke="#436c9b" stroke-width="1.7"/>
+<text x="175.0" y="320" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">ChatLab JSON</text>
+<path d="M81 338 H269" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="87" y="377" font-family="'SFMono-Regular',Consolas,monospace" font-size="19" font-weight="400" fill="#436c9b" text-anchor="start">chatlab.version</text>
+<text x="87" y="416" font-family="'SFMono-Regular',Consolas,monospace" font-size="19" font-weight="400" fill="#436c9b" text-anchor="start">meta / members</text>
+<text x="87" y="455" font-family="'SFMono-Regular',Consolas,monospace" font-size="19" font-weight="400" fill="#436c9b" text-anchor="start">messages</text>
+<path d="M87 490 H263" fill="none" stroke="#dce3ec" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="87" y="525" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">统一公开输入格式</text>
+<rect x="65" y="650" width="220" height="105" rx="8" fill="white" stroke="#c9d7e6" stroke-width="1.7"/>
+<text x="83" y="685" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">已有 JSON 文件</text>
+<text x="83" y="722" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">或外部 QQ 导出器</text>
+<path d="M175 650 L175 576" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="65" y="809" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="start">按目标日期选择文件</text>
+<text x="65" y="846" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="start">校验输入结构</text>
+<text x="65" y="883" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="start">提取消息列表</text>
+<text x="65" y="931" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#436c9b" text-anchor="start">无可用消息：结束流程</text>
+<rect x="360" y="280" width="170" height="290" rx="10" fill="white" stroke="#277e79" stroke-width="1.7"/>
+<text x="445.0" y="320" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">清洗与脱敏</text>
+<path d="M376 338 H514" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="379" y="378" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">过滤系统消息</text>
+<text x="379" y="415" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">清理纯噪声</text>
+<text x="379" y="452" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">发送者匿名化</text>
+<text x="379" y="489" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">联系方式脱敏</text>
+<text x="379" y="526" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">链接与引用脱敏</text>
+<path d="M285 425 L354 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M530 425 L552 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="571.0" y="335" width="130" height="220" rx="8" fill="white" stroke="#277e79" stroke-width="1.7"/>
+<rect x="566.0" y="325" width="130" height="220" rx="8" fill="white" stroke="#277e79" stroke-width="1.7"/>
+<rect x="561.0" y="315" width="130" height="220" rx="8" fill="white" stroke="#277e79" stroke-width="1.7"/>
+<text x="626" y="352" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="22" font-weight="600" fill="#277e79" text-anchor="middle">重叠分块</text>
+<rect x="575" y="375" width="103" height="32" rx="6" fill="#f3f9f8" stroke="#277e79" stroke-width="1.7"/>
+<text x="626.5" y="398" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="17" font-weight="500" fill="#277e79" text-anchor="middle">Chunk 1</text>
+<rect x="575" y="422" width="103" height="32" rx="6" fill="#f3f9f8" stroke="#277e79" stroke-width="1.7"/>
+<text x="626.5" y="445" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="17" font-weight="500" fill="#277e79" text-anchor="middle">Chunk 2</text>
+<rect x="575" y="469" width="103" height="32" rx="6" fill="#f3f9f8" stroke="#277e79" stroke-width="1.7"/>
+<text x="626.5" y="492" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="17" font-weight="500" fill="#277e79" text-anchor="middle">Chunk 3</text>
+<path d="M581 415 H672 M581 462 H672" fill="none" stroke="#277e79" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5"/>
+<rect x="360" y="650" width="340" height="105" rx="8" fill="white" stroke="#bdd9d5" stroke-width="1.7"/>
+<text x="378" y="684" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="600" fill="#277e79" text-anchor="start">内部消息标识</text>
+<text x="378" y="724" font-family="'SFMono-Regular',Consolas,monospace" font-size="20" font-weight="400" fill="#192938" text-anchor="start">M00001  ·  User_1</text>
+<text x="360" y="809" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">默认分块：400 条 / 20,000 字符</text>
+<text x="360" y="846" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">相邻块重叠 20 条消息</text>
+<text x="360" y="883" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">保留时间与脱敏后的回复上下文</text>
+<text x="360" y="931" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#277e79" text-anchor="start">脱敏在模型调用前完成</text>
+<rect x="775" y="280" width="200" height="290" rx="10" fill="white" stroke="#76609d" stroke-width="1.7"/>
+<text x="875.0" y="320" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">① 分块提取</text>
+<path d="M791 338 H959" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="793" y="367" width="164" height="32" rx="6" fill="#f8f6fb" stroke="#76609d" stroke-width="1.7"/>
+<text x="875.0" y="390" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="500" fill="#76609d" text-anchor="middle">Chunk 1 → LLM</text>
+<rect x="793" y="414" width="164" height="32" rx="6" fill="#f8f6fb" stroke="#76609d" stroke-width="1.7"/>
+<text x="875.0" y="437" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="500" fill="#76609d" text-anchor="middle">Chunk 2 → LLM</text>
+<rect x="793" y="461" width="164" height="32" rx="6" fill="#f8f6fb" stroke="#76609d" stroke-width="1.7"/>
+<text x="875.0" y="484" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="500" fill="#76609d" text-anchor="middle">Chunk n → LLM</text>
+<text x="875" y="548" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#586777" text-anchor="middle">并发提取候选信息</text>
+<path d="M701 425 L769 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="1005" y="280" width="200" height="290" rx="10" fill="white" stroke="#76609d" stroke-width="1.7"/>
+<text x="1105.0" y="320" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">候选信息 JSON</text>
+<path d="M1021 338 H1189" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1022" y="372" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">内容摘要</text>
+<text x="1022" y="409" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">类别 / 置信度</text>
+<text x="1022" y="446" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="start">时间线 / 不确定性</text>
+<rect x="1020" y="483" width="170" height="57" rx="7" fill="#f3eef9" stroke="none" stroke-width="1.7"/>
+<text x="1032" y="507" font-family="'SFMono-Regular',Consolas,monospace" font-size="17" font-weight="400" fill="#76609d" text-anchor="start">evidence:</text>
+<text x="1032" y="530" font-family="'SFMono-Regular',Consolas,monospace" font-size="17" font-weight="400" fill="#76609d" text-anchor="start">[&quot;M00001&quot;, …]</text>
+<path d="M975 425 L999 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="1235" y="260" width="250" height="330" rx="10" fill="white" stroke="#76609d" stroke-width="1.7"/>
+<text x="1360.0" y="300" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">② 分板块编辑</text>
+<path d="M1251 318 H1469" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<rect x="1251" y="335" width="218" height="49" rx="6" fill="#f8f6fb" stroke="#d8cce6" stroke-width="1.7"/>
+<text x="1264" y="357" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#192938" text-anchor="start">今日值得关注</text>
+<text x="1264" y="376" font-family="'SFMono-Regular',Consolas,monospace" font-size="14" font-weight="400" fill="#76609d" text-anchor="start">high_value</text>
+<rect x="1251" y="393" width="218" height="49" rx="6" fill="#f8f6fb" stroke="#d8cce6" stroke-width="1.7"/>
+<text x="1264" y="415" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#192938" text-anchor="start">今日讨论脉络</text>
+<text x="1264" y="434" font-family="'SFMono-Regular',Consolas,monospace" font-size="14" font-weight="400" fill="#76609d" text-anchor="start">timeline_topics</text>
+<rect x="1251" y="451" width="218" height="49" rx="6" fill="#f8f6fb" stroke="#d8cce6" stroke-width="1.7"/>
+<text x="1264" y="473" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#192938" text-anchor="start">传闻与待核实</text>
+<text x="1264" y="492" font-family="'SFMono-Regular',Consolas,monospace" font-size="14" font-weight="400" fill="#76609d" text-anchor="start">uncertain</text>
+<rect x="1251" y="509" width="218" height="49" rx="6" fill="#f8f6fb" stroke="#d8cce6" stroke-width="1.7"/>
+<text x="1264" y="531" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#192938" text-anchor="start">轻松一刻</text>
+<text x="1264" y="550" font-family="'SFMono-Regular',Consolas,monospace" font-size="14" font-weight="400" fill="#76609d" text-anchor="start">light_moments</text>
+<text x="1360" y="581" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="15" font-weight="400" fill="#586777" text-anchor="middle">各板块独立请求 · 最多 2 路并发</text>
+<path d="M1205 425 L1229 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="1515" y="280" width="230" height="290" rx="10" fill="white" stroke="#76609d" stroke-width="1.7"/>
+<text x="1630.0" y="320" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">合并与校验</text>
+<path d="M1531 338 H1729" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1535" y="375" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">JSON 结构与数量</text>
+<text x="1535" y="414" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">证据编号有效性</text>
+<text x="1535" y="453" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">板块引用范围</text>
+<text x="1535" y="492" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="400" fill="#586777" text-anchor="start">活跃时段覆盖</text>
+<rect x="1533" y="527" width="194" height="32" rx="6" fill="#f3eef9" stroke="#76609d" stroke-width="1.7"/>
+<text x="1630.0" y="550" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="500" fill="#76609d" text-anchor="middle">校验通过</text>
+<path d="M1485 425 L1509 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<path d="M935 570 V613 H815 V576" fill="none" stroke="#76609d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="875" y="643" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#76609d" text-anchor="middle">失败反馈 / 重试</text>
+<path d="M1450 590 V613 H1270 V596" fill="none" stroke="#76609d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="1360" y="643" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#76609d" text-anchor="middle">失败反馈 / 重试</text>
+<text x="1630" y="635" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#76609d" text-anchor="middle">最终校验失败则中止</text>
+<rect x="775" y="683" width="970" height="72" rx="8" fill="white" stroke="#d8cce6" stroke-width="1.7"/>
+<text x="796" y="713" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="600" fill="#76609d" text-anchor="start">恢复与复用</text>
+<text x="946" y="713" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="start">分块检查点  ·  失败块可二分重试  ·  终稿板块缓存</text>
+<text x="796" y="741" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#586777" text-anchor="start">只复用通过校验且与当前输入匹配的结果</text>
+<text x="775" y="809" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="start">提取阶段：为候选信息保留真实消息编号；没有明确回答的提问不作为事实。</text>
+<text x="775" y="846" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="21" font-weight="400" fill="#586777" text-anchor="start">编辑阶段：合并重复内容，按板块约束可引用证据，保留时间线与不确定性。</text>
+<text x="775" y="931" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#76609d" text-anchor="start">证据编号供内部校验使用，不代表自动核实信息真实性</text>
+<rect x="1820" y="280" width="355" height="290" rx="10" fill="white" stroke="#9b7431" stroke-width="1.7"/>
+<text x="1997.5" y="320" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="25" font-weight="600" fill="#192938" text-anchor="middle">Markdown 日报</text>
+<path d="M1836 338 H2159" fill="none" stroke="#e3e7ed" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<text x="1840" y="376" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="23" font-weight="600" fill="#9b7431" text-anchor="start">程序确定性渲染</text>
+<text x="1840" y="420" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="22" font-weight="400" fill="#586777" text-anchor="start">固定四板块与顺序</text>
+<text x="1840" y="462" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="22" font-weight="400" fill="#586777" text-anchor="start">不公开内部证据编号</text>
+<text x="1840" y="504" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="22" font-weight="400" fill="#586777" text-anchor="start">写入本地私有报告目录</text>
+<path d="M1745 425 L1814 425" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<rect x="1820" y="626" width="355" height="72" rx="8" fill="white" stroke="#9b7431" stroke-width="1.7"/>
+<text x="1997" y="655" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="22" font-weight="600" fill="#192938" text-anchor="middle">发布检查</text>
+<text x="1997" y="683" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="middle">结构 / 联系方式 / 高风险标签</text>
+<path d="M1997 570 L1997 620" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="2011" y="605" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="16" font-weight="400" fill="#586777" text-anchor="start">完整流水线</text>
+<rect x="1820" y="756" width="355" height="63" rx="8" fill="white" stroke="#9b7431" stroke-width="1.7" stroke-dasharray="7 5"/>
+<text x="1997" y="795" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="22" font-weight="500" fill="#9b7431" text-anchor="middle">Cloudflare R2  ·  可选发布</text>
+<path d="M1997 698 L1997 750" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="2011" y="735" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="16" font-weight="400" fill="#586777" text-anchor="start">检查通过</text>
+<rect x="1820" y="875" width="164" height="57" rx="8" fill="white" stroke="#9b7431" stroke-width="1.7" stroke-dasharray="7 5"/>
+<rect x="2005" y="875" width="170" height="57" rx="8" fill="white" stroke="#9b7431" stroke-width="1.7" stroke-dasharray="7 5"/>
+<text x="1902" y="910" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="20" font-weight="500" fill="#9b7431" text-anchor="middle">Pages 阅读</text>
+<text x="2090" y="910" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="500" fill="#9b7431" text-anchor="middle">Telegram 概览</text>
+<path d="M1997 819 V844 H1902 V869" fill="none" stroke="#6b7885" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<path d="M1997 844 H2090 V869" fill="none" stroke="#6b7885" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<path d="M40 990 H2200" fill="none" stroke="#d9e0e6" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+<path d="M43 1017 L92 1017" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#arrow)"/>
+<text x="106" y="1024" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#586777" text-anchor="start">主流程</text>
+<path d="M232 1017 L282 1017" fill="none" stroke="#6b7885" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="296" y="1024" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#586777" text-anchor="start">可选分发</text>
+<path d="M449 1017 H499" fill="none" stroke="#76609d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#arrow)"/>
+<text x="514" y="1024" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="18" font-weight="400" fill="#586777" text-anchor="start">模型请求校验 / 重试</text>
+<text x="2200" y="1024" font-family="'PingFang SC','Noto Sans CJK SC','Microsoft YaHei',Arial,sans-serif" font-size="19" font-weight="400" fill="#586777" text-anchor="end">图示描述代码能力；公开日报已停止每日更新，Pages 为历史预览。</text>
+</svg>

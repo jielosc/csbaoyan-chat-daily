@@ -14,11 +14,9 @@
 - 可选发布到 Cloudflare R2，并发送 Telegram 概览；
 - 可选使用 macOS LaunchAgent 或 Windows 任务计划定时运行。
 
-```text
-ChatLab JSON → 匿名化 → LLM 结构化提取 → 校验 → Markdown
-                                                  ├─ R2（可选）
-                                                  └─ Telegram（可选）
-```
+![从群聊到结构化日报的系统流程](./docs/figures/workflow.svg)
+
+[查看大图与图注](./docs/figures/workflow.html) · [高清 PNG](./docs/figures/workflow.png) · [可编辑 SVG](./docs/figures/workflow.svg)
 
 原始消息、脱敏记录、中间结果和最终报告默认保存在被 Git 忽略的私有目录中。仓库不包含公开日报的数据源；`pages/` 只是读取历史公开数据的静态预览前端。
 
